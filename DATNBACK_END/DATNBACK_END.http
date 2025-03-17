@@ -1,0 +1,6 @@
+@DATNBACK_END_HostAddress = http://localhost:5048
+
+GET {{DATNBACK_END_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
