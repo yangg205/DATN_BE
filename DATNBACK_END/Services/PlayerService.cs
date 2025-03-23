@@ -1,4 +1,6 @@
+using DATNBACK_END.Helpers;
 using DATNBACK_END.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace DATNBACK_END.Services;
 public class PlayerService : IPlayerService
@@ -8,33 +10,54 @@ public class PlayerService : IPlayerService
     {
         _context = context;
     }
-    public Task<Player> AddPlayer( string email,string name,string Password)
+    public Task<ReturnPlayer> Register( string email,string Password, string Repassword)
     {
         try
         {
-
-            var Player = _context.Player.FirstOrDefault(x => x.Name == name);
+            System.Console.WriteLine($"{email} {Password}");    
+            var Player = _context.Player.FirstOrDefault(x => x.Email == email);
             if (Player != null)
-            {
-                throw new Exception("Player is already exist");
+                return Task.FromResult(new ReturnPlayer{
+                    status = false,
+                    message = "Email đã tồn tại"
+                });
+            if(Repassword != Password){
+                return Task.FromResult(new ReturnPlayer{
+                    status = false,
+                    message = "Mật khẩu không trùng khớp"
+                });
             }
-            var PLayerResult = new Player
-            {
+            //thuc hien goi ma hoa password
+            PasswordHasher.CreatePasswordHash(Password,out var passwordHash, out var passwordSalt);
+            var newPlayer = new Player{
                 Email = email,
-                Name = name,
-                Password = Password,
-                Repassword = Password,
-                Password_Salt = Password,
-                Total_coin = 0,
+                Password = Convert.ToBase64String(passwordHash),
+                Repassword = Convert.ToBase64String(passwordHash),
+                Password_Salt = Convert.ToBase64String(passwordSalt),
+                Name = $"Player {_context.Player.Count()}",
                 Total_Money = 0,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
             };
-            _context.Player.Add(PLayerResult);
+            _context.Player.Add(newPlayer);
             _context.SaveChanges();
-            return Task.FromResult(PLayerResult);
+            var obj = new ReturnPlayer{
+                status = true,
+                message = "Đăng ký thành công",
+                Player = new Player{
+                    Email = newPlayer.Email,
+                    Name = newPlayer.Name,
+                    Total_Money = newPlayer.Total_Money
+                }
+            };
+            return Task.FromResult(obj);
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.InnerException.Message);
+            return Task.FromResult(new ReturnPlayer{
+                status = false,
+                message = "Đăng ký thất bại"
+            });
             throw new Exception(e.Message);
         }
     }

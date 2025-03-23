@@ -12,12 +12,12 @@ public class PlayerContoller : ControllerBase
         _playerService = playerService;
     }
     [HttpPost]
-    [Route("api/addPlayer")]
-    public async Task<IActionResult> AddPlayer([FromBody] Player player)
+    [Route("api/Register")]
+    public async Task<IActionResult> Register([FromBody] Dangky player)
     {
         try
         {
-            var Result = await _playerService.AddPlayer(player.Email, player.Name, player.Password);
+            var Result = await _playerService.Register(player.Email,player.Password,player.Repassword);
             return Ok(new{
                 data = Result
             });
