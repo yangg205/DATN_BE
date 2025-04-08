@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DATNBACK_END")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fb901bcfee003c56b45134c63a872d1615c8b147")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4652efce6d5952d2dc77760be363bfb059a0eab1")]
 [assembly: System.Reflection.AssemblyProductAttribute("DATNBACK_END")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DATNBACK_END")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DATNBACK_END.Controllers;
 [ApiController]
+[Route("api/player")]
 public class PlayerContoller : ControllerBase
 {
     private readonly IPlayerService _playerService;
@@ -11,13 +12,12 @@ public class PlayerContoller : ControllerBase
     {
         _playerService = playerService;
     }
-    [HttpPost]
-    [Route("api/Register")]
-    public async Task<IActionResult> Register([FromBody] Dangky player)
+    [HttpPost("register")]
+    public async Task<IActionResult> RegisterTemp([FromBody] Dangky player)
     {
         try
         {
-            var Result = await _playerService.Register(player.Email,player.Password,player.Repassword);
+            var Result = await _playerService.RegisterPendingPlayer(player.Email,player.Password,player.Repassword);
             return Ok(new{
                 data = Result
             });
@@ -27,8 +27,19 @@ public class PlayerContoller : ControllerBase
             return StatusCode(500,e.Message);
         }
     }
-    [HttpGet]
-    [Route("api/getPlayers")]
+    [HttpPost("verifyOtp{email},{otp}")]
+    public async Task<IActionResult> VerifyOtp(string email,string otp){
+        try{
+            var Result = _playerService.VerifyOtpAndRegister(email,otp);
+            return Ok(new{
+               data = Result, 
+            });
+        }
+        catch(Exception e){
+            return StatusCode(500,e.Message);
+        }
+    }
+    [HttpGet("getPlayers")]
     public async Task<IActionResult> getPlayer(){
         try
         {
@@ -37,7 +48,7 @@ public class PlayerContoller : ControllerBase
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message);
+            return StatusCode(500,e.Message);
         }
     }
 }

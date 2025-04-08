@@ -2,35 +2,38 @@ using Microsoft.Extensions.Options;
 using MimeKit;
 
 namespace DATNBACK_END.Helpers;
-public class EmailSetting{
-    public string? Host {get;set;}
-    public string? Port {get;set;}
-    public string? Password {get;set;}
-    public string? Name {get;set;}
-    public string? From {get;set;}
+public class EmailSetting
+{
+    public string? Host { get; set; }
+    public string? Port { get; set; }
+    public string? Password { get; set; }
+    public string? Name { get; set; }
+    public string? From { get; set; }
 }
-public interface IEmailService{
-    void SendEmail(string toEmail, string subject, string body);
+public interface IEmailService
+{
+    void SendOTPEmail(string toEmail, string subject, string otp);
 }
-public class EmailService : IEmailService{
+public class EmailService : IEmailService
+{
     private readonly EmailSetting _emailSetting;
-    public EmailService(IOptions<EmailSetting> emailSetting){
+    public EmailService(IOptions<EmailSetting> emailSetting)
+    {
         _emailSetting = emailSetting.Value;
     }
-   public void SendEmail(string toEmail, string subject, string body)
+     public void SendOTPEmail(string toEmail, string subject, string otp)
     {
         try
         {
             var message = new MimeMessage();
             var bodybuilder = new BodyBuilder();
             message.From.Add(new MailboxAddress(_emailSetting.Name, _emailSetting.From));
-            message.To.Add(new MailboxAddress("zanyang", toEmail));
+            message.To.Add(new MailboxAddress("yangkaka", toEmail));
             message.Subject = subject;
 
-            using (var reader = System.IO.File.OpenText("Helper/Template.html")){
+            using (var reader = System.IO.File.OpenText("Helpers/OTPTemplate.html")){
                 bodybuilder.HtmlBody = reader.ReadToEnd();
-                bodybuilder.HtmlBody = bodybuilder.HtmlBody.Replace("{name}", toEmail);
-
+                bodybuilder.HtmlBody = bodybuilder.HtmlBody.Replace("[OTP_CODE]", otp);
             }
 
             message.Body = bodybuilder.ToMessageBody();
@@ -38,7 +41,7 @@ public class EmailService : IEmailService{
             // {
             //     Text = body
             // };
-            
+        
             using var client = new MailKit.Net.Smtp.SmtpClient();
             client.Connect(_emailSetting.Host, 
                     int.Parse(_emailSetting.Port), MailKit.Security.SecureSocketOptions.StartTls);
