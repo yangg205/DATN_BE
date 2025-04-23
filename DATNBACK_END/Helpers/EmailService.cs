@@ -2,6 +2,7 @@ using Microsoft.Extensions.Options;
 using MimeKit;
 
 namespace DATNBACK_END.Helpers;
+
 public class EmailSetting
 {
     public string? Host { get; set; }
@@ -10,18 +11,22 @@ public class EmailSetting
     public string? Name { get; set; }
     public string? From { get; set; }
 }
+
 public interface IEmailService
 {
     void SendOTPEmail(string toEmail, string subject, string otp);
 }
+
 public class EmailService : IEmailService
 {
     private readonly EmailSetting _emailSetting;
+
     public EmailService(IOptions<EmailSetting> emailSetting)
     {
         _emailSetting = emailSetting.Value;
     }
-     public void SendOTPEmail(string toEmail, string subject, string otp)
+
+    public void SendOTPEmail(string toEmail, string subject, string otp)
     {
         try
         {
@@ -31,7 +36,8 @@ public class EmailService : IEmailService
             message.To.Add(new MailboxAddress("yangkaka", toEmail));
             message.Subject = subject;
 
-            using (var reader = System.IO.File.OpenText("Helpers/OTPTemplate.html")){
+            using (var reader = System.IO.File.OpenText("Template/OTPTemplate.html"))
+            {
                 bodybuilder.HtmlBody = reader.ReadToEnd();
                 bodybuilder.HtmlBody = bodybuilder.HtmlBody.Replace("[OTP_CODE]", otp);
             }
@@ -41,10 +47,12 @@ public class EmailService : IEmailService
             // {
             //     Text = body
             // };
-        
             using var client = new MailKit.Net.Smtp.SmtpClient();
-            client.Connect(_emailSetting.Host, 
-                    int.Parse(_emailSetting.Port), MailKit.Security.SecureSocketOptions.StartTls);
+            client.Connect(
+                _emailSetting.Host,
+                int.Parse(_emailSetting.Port),
+                MailKit.Security.SecureSocketOptions.StartTls
+            );
             client.Authenticate(_emailSetting.From, _emailSetting.Password);
             client.Send(message);
             client.Disconnect(true);

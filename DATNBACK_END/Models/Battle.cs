@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace DATNBACK_END.Models;
+
 public class Battle
 {
     [Key]

@@ -1,4 +1,5 @@
 namespace DATNBACK_END.Models;
+
 public class PendingPlayer
 {
     public int PendingPlayer_id { get; set; }
