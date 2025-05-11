@@ -21,6 +21,7 @@ public class PlayerCharacterService : IPlayerCharacterService
                 PC.Current_hp = player_Characters.Current_hp;
                 PC.Current_exp = player_Characters.Current_exp;
                 PC.level = player_Characters.level;
+                PC.Total_point = player_Characters.Total_point;
                 PC.Total_coin = player_Characters.Total_coin;
                 PC.Skill_Point = player_Characters.Skill_Point;
                 PC.Position_x = player_Characters.Position_x;
@@ -70,11 +71,13 @@ public class PlayerCharacterService : IPlayerCharacterService
                 message = "Dữ liệu đã load thành công",
                 player_Characters = new Player_Characters
                 {
+                    Player_Character_id = PC.Player_Character_id,
                     Player_id = PC.Player_id,
                     Characters_id = PC.Characters_id,
                     Current_hp = PC.Current_hp,
                     Current_exp = PC.Current_exp,
                     level = PC.level,
+                    Total_point = PC.Total_point,
                     Total_coin = PC.Total_coin,
                     Skill_Point = PC.Skill_Point,
                     Position_x = PC.Position_x,
@@ -142,6 +145,7 @@ public class PlayerCharacterService : IPlayerCharacterService
                 Current_hp = character.Hp, // Máu hiện tại bằng máu của nhân vật
                 Current_exp = 0,
                 level = 1,
+                Total_point = 0,
                 Total_coin = 0,
                 Skill_Point = 0,
                 Position_x = 0f, // Vị trí mặc định
@@ -189,15 +193,7 @@ public class PlayerCharacterService : IPlayerCharacterService
     }
     public async Task<List<Player_Characters>> GetAllPlayerCharacter()
     {
-        try
-        {
-            var playerCharacters = await _context.Player_Characters.ToListAsync();
+        var playerCharacters = await _context.Player_Characters.ToListAsync();
             return playerCharacters;
-        }
-        catch (Exception e)
-        {
-            System.Console.WriteLine(e.Message);
-            return null;
-        }
     }
 }

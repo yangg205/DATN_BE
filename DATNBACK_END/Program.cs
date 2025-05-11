@@ -43,7 +43,7 @@ builder.Services.AddDbContext<AppDataContext>(options =>
 builder.Services.AddScoped<IPlayerService,PlayerService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IPlayerCharacterService,PlayerCharacterService>();
-
+builder.Services.AddScoped<IPlayerCharacterSkillService,PlayerCharacterSkillService>();
 // "DbSetting": {
 //     "ConnectionString": "Data Source=SQL1001.site4now.net;Initial Catalog=db_ab18c1_3dnangcao;User Id=db_ab18c1_3dnangcao_admin;Password=yangg2206"
 //   },

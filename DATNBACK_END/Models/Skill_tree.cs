@@ -6,17 +6,17 @@ public class Skill_tree
 {
     [Key]
     public int Skill_tree_id { get; set; }
-    public int Character_id { get; set; }
-    public int Skill_id { get; set; }
-    public int Id_parent { get; set; }
+    public int Characters_id { get; set; }
     public string? Name { get; set; }
     public string? Description { get; set; }
-    public int? Hp { get; set; }
-    public int? Atk { get; set; }
-    public int? Def { get; set; }
-    public int? Magic { get; set; }
+    public double? Atk { get; set; }
+    public double? Def { get; set; }
+    public double? Magic { get; set; }
+    public int? MP { get; set; }
+    public int? HP { get; set; }
+    public double? Atk_speed { get; set; }
     public double? Crit { get; set; }
     public double? Critdame { get; set; }
-    public int? Mana { get; set; }
-    public int? Maxlevel { get; set; }
+    public double? Time { get; set;}
+    public int? Id_parent { get; set; }
 }

@@ -12,6 +12,7 @@ public class Player_Characters
     public int? Current_hp { get; set; }
     public int? Current_exp { get; set; }
     public int? level { get; set; }
+    public int? Total_point { get; set; }
     public int? Total_coin { get; set; }
     public int? Skill_Point { get; set; }
     public double? Position_x { get; set; }
