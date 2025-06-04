@@ -3,5 +3,6 @@ namespace DATNBACK_END.Services;
 
 public interface IPlayerCharacterSkillService
 {
-    Task<ReturnPlayerCharacterSkill> UpdateSkill(int Player_Characters_id,int skill_tree_id);
+    Task<ReturnPlayerCharacterSkill> UpdateSkill(int Player_Characters_id, int skill_tree_id);
+    Task<bool> DeleteSkill(int Player_Characters_id, int skill_tree_id);
 }

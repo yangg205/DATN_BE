@@ -11,4 +11,5 @@ public interface IPlayerService
     Task<ReturnPlayer> LoginWithGoogleToken(string Token);
     Task<Player> GetPlayersByEmail(string email);
     Task<bool> deletePlayer(string email);
+    Task<ReturnPlayer> Updatemoney(string email, decimal amount);
 }

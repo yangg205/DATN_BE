@@ -1,0 +1,72 @@
+@{
+    ViewData["Title"] = "Recharge";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nạp tiền</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="@Url.Content("~/favicon.ico")" type="image/x-icon">
+    <meta name="description" content="Trang nạp tiền cho tài khoản game.">
+    <meta name="keywords" content="Nạp tiền, PayPal, Game, Thanh toán">
+    <meta name="author" content="Tên của bạn">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+        .form-container {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            color: white;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <video autoplay loop muted>
+        <source src="@Url.Content("~/Video/Recording.mp4")" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <div class="form-container">
+        <h3 class="mb-4">Nạp tiền</h3>
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+        }
+        <form action="StartRecharge" method="post">
+            <div class="mb-3">
+                <label for="amount" class="form-label">Số tiền cần nạp (USD)</label>
+                <input type="number" class="form-control" id="amount" name="amount" placeholder="Nhập số tiền" step="0.01" min="1" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 mb-2">Thanh toán với PayPal</button>
+        </form>
+        <a class="btn btn-secondary w-100" href="@Url.Action("Index", "Admin")">Hủy thanh toán</a>
+    </div>
+</body>
+</html>

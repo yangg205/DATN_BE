@@ -1,131 +1,89 @@
-@{
-    ViewData["Title"] = "Đăng nhập & Đăng ký";
-    Layout = null; // Không sử dụng layout chung nếu chỉ cần một file độc lập
-}
-
+@model IEnumerable<DATNBACK_END.Models.Player>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url('/photo/backgr1.png') no-repeat center center;
+            background-size: cover;
+        }
+
+        .header {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 3;
+            color: white;
+            text-align: right;
+        }
+
+        .account-info {
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+
+        .account-info strong {
+            margin-right: 10px;
+        }
+
+        .account-info span {
+            margin-left: 5px;
+        }
+
+        .btn-sm {
+            font-size: 0.9rem;
+        }
+
+        #downloadButton {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+        }
+    </style>
 </head>
+
 <body>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div id="form-container">
-                    <!-- Thông báo lỗi -->
-                    @if (ViewBag.Error != null)
-                    {
-                        <div class="alert alert-danger">@ViewBag.Error</div>
-                    }
-
-                    <!-- Thông báo thành công -->
-                    @if (ViewBag.Success != null)
-                    {
-                        <div class="alert alert-success">@ViewBag.Success</div>
-                    }
-
-                    <!-- Form Đăng nhập -->
-                    <div id="login-form">
-                        <h3 class="text-center">Đăng nhập</h3>
-                        <form method="post" action="/Admin/Login">
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" required />
-                            </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Mật khẩu</label>
-                                <input type="password" class="form-control" id="password" name="password" required />
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
-                        </form>
-
-                        <div class="text-center mt-3">
-                            <a href="#" onclick="showRegisterForm()">Bạn chưa có tài khoản? Đăng ký</a>
-                        </div>
-                    </div>
-
-                    <!-- Form Đăng ký -->
-                    <div id="register-form" style="display: none;">
-                        <h3 class="text-center">Đăng ký</h3>
-                        <form method="post" action="/Admin/Register">
-                            <div class="mb-3">
-                                <label for="registerEmail" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="registerEmail" name="email" required />
-                            </div>
-                            <div class="mb-3">
-                                <label for="registerPassword" class="form-label">Mật khẩu</label>
-                                <input type="password" class="form-control" id="registerPassword" name="password" required />
-                            </div>
-                            <div class="mb-3">
-                                <label for="registerRepassword" class="form-label">Nhập lại mật khẩu</label>
-                                <input type="password" class="form-control" id="registerRepassword" name="repassword" required />
-                            </div>
-                            <button type="submit" class="btn btn-success w-100">Đăng ký</button>
-                        </form>
-
-                        <div class="text-center mt-3">
-                            <a href="#" onclick="showLoginForm()">Bạn đã có tài khoản? Đăng nhập</a>
-                        </div>
-                    </div>
-
-                    <!-- Nút Đăng nhập bằng Google -->
-                    <div class="mt-3 text-center" id="google-login-container"></div>
-                </div>
-            </div>
+    <!-- Header -->
+    <div class="header">
+        <div class="account-info">
+            <strong>@ViewData["UserName"]</strong>
+            <span class="mx-3">|</span>
+            <span>Balance: <span>$@ViewData["UserBalance"]</span></span>
+            <button class="btn btn-success me-2" id="rechargeButton">Nạp tiền</button>
+            <form action="/Admin/Logout" method="get" style="display: inline;">
+                <button type="submit" class="btn btn-danger">Đăng xuất</button>
+            </form>
         </div>
     </div>
 
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Download Button -->
+    <button id="downloadButton" class="btn btn-warning">Download Game</button>
+
     <script>
-        function showLoginForm() {
-            document.getElementById("login-form").style.display = "block";
-            document.getElementById("register-form").style.display = "none";
-        }
-
-        function showRegisterForm() {
-            document.getElementById("login-form").style.display = "none";
-            document.getElementById("register-form").style.display = "block";
-        }
-
-        function handleGoogleLogin(response) {
-            const idToken = response.credential;
-            if (!idToken) {
-                alert("Lỗi: Không nhận được token từ Google.");
-                return;
-            }
-
-            fetch("/Admin/LoginWithGoogle", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ idToken }),
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status) {
-                        alert(data.message);
-                        window.location.href = "/Admin/Dashboard";
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(err => console.error("Lỗi khi đăng nhập Google:", err));
-        }
-
-        window.onload = function () {
-            google.accounts.id.initialize({
-                client_id: "1058105992725-7kbfjje1jc8v3fgglubnvekc5dsged99.apps.googleusercontent.com",
-                callback: handleGoogleLogin,
+        document.addEventListener('DOMContentLoaded', () => {
+            // Chuyển đến trang nạp tiền
+            const rechargeButton = document.getElementById('rechargeButton');
+            rechargeButton.addEventListener('click', () => {
+                window.location.href = '/admin/recharge';
             });
-
-            google.accounts.id.renderButton(
-                document.getElementById("google-login-container"),
-                { theme: "outline", size: "large", width: "100%" }
-            );
-        };
+        });
     </script>
 </body>
+
 </html>

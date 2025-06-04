@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace DATNBACK_END.Services;
+
 public class PlayerCharacterService : IPlayerCharacterService
 {
     private readonly AppDataContexts.AppDataContext _context;
@@ -52,11 +53,11 @@ public class PlayerCharacterService : IPlayerCharacterService
             };
         }
     }
-    public async Task<ReturnPlayerCharacter> ContinueGame(int Player_id, int Character_id)
+    public async Task<ReturnPlayerCharacter> ContinueGame(int playerCharacterId)
     {
         try
         {
-            var PC = await _context.Player_Characters.FirstOrDefaultAsync(x => x.Player_id == Player_id && x.Characters_id == Character_id);
+            var PC = await _context.Player_Characters.FirstOrDefaultAsync(x => x.Player_Character_id == playerCharacterId);
             if (PC == null)
             {
                 return await Task.FromResult(new ReturnPlayerCharacter
@@ -174,7 +175,8 @@ public class PlayerCharacterService : IPlayerCharacterService
             };
         }
     }
-    public async Task<bool> DeleteAllPlayerCharacter(){
+    public async Task<bool> DeleteAllPlayerCharacter()
+    {
         try
         {
             var playerCharacters = await _context.Player_Characters.ToListAsync();
@@ -194,6 +196,108 @@ public class PlayerCharacterService : IPlayerCharacterService
     public async Task<List<Player_Characters>> GetAllPlayerCharacter()
     {
         var playerCharacters = await _context.Player_Characters.ToListAsync();
-            return playerCharacters;
+        return playerCharacters;
     }
+    public async Task<bool> UpdateSkillPoint(int playerCharacterId, int Point)
+    {
+        try
+        {
+            var playerCharacter = await _context.Player_Characters
+                .FirstOrDefaultAsync(pc => pc.Player_Character_id == playerCharacterId);
+            if (playerCharacter == null)
+            {
+                return false;
+            }
+            playerCharacter.Skill_Point += Point;
+            _context.Player_Characters.Update(playerCharacter);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            System.Console.WriteLine(ex.Message);
+            return false;
+        }
+    }
+    public async Task<List<Ranking>> RankingPlayerCharacter(int Character_id)
+    {
+        try
+        {
+            // Lấy dữ liệu từ bảng Player_Characters
+            var query = _context.Player_Characters.AsQueryable();
+
+            // Nếu Character_id khác 0, lọc theo Character_id
+            if (Character_id != 0)
+            {
+                query = query.Where(pc => pc.Characters_id == Character_id);
+            }
+
+            // Thực hiện join với bảng Player và sắp xếp theo Total_point
+            var rankings = await query
+                .Join(
+                    _context.Player,
+                    pc => pc.Player_id, // Khóa liên kết từ Player_Characters
+                    p => p.Player_id,   // Khóa liên kết từ Player
+                    (pc, p) => new
+                    {
+                        PlayerName = p.Name,               // Tên người chơi
+                        Total_point = pc.Total_point       // Điểm tổng
+                    }
+                )
+                .OrderByDescending(r => r.Total_point)    // Sắp xếp theo điểm tổng
+                .ToListAsync();
+
+            // Gán thứ hạng
+            var rankedResult = rankings
+                .Select((r, index) => new Ranking
+                {
+                    PlayerName = r.PlayerName,
+                    Total_point = (int?)r.Total_point,
+                    Rank = index + 1 // Thứ hạng bắt đầu từ 1
+                })
+                .ToList();
+
+            return rankedResult;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+
+            // Trả về thông báo lỗi nếu có vấn đề xảy ra
+            return new List<Ranking>
+        {
+            new Ranking
+            {
+                PlayerName = "Error",
+                Total_point = 0,
+                Rank = -1
+            }
+        };
+        }
+    }
+
+    public async Task<PlayerCharacterSkillPoint> GetSkillPoint(int Player_Character_id)
+    {
+        try
+        {
+            var playerCharacter = await _context.Player_Characters
+                .FirstOrDefaultAsync(pc => pc.Player_Character_id == Player_Character_id);
+            if (playerCharacter == null)
+            {
+                throw new Exception("Player_Character không tồn tại");
+            }
+            return new PlayerCharacterSkillPoint
+            {
+                PlayerCharacterId = playerCharacter.Player_Character_id,
+                SkillPoint = playerCharacter.Skill_Point
+            };
+
+        }
+        catch (Exception e)
+        {
+            System.Console.WriteLine(e.Message);
+            throw new Exception("Lỗi hệ thống khi lấy Skill Point");
+        }
+    }
+
 }

@@ -1,11 +1,39 @@
 {
   "Version": 1,
-  "Hash": "ZAEnrN4luAiBVn6hFhIxk3qUFtO1OZp2GPyzHUVpxFY=",
+  "Hash": "cDlkSrQumaLKFVl7QDHBUDz8sL1TGn+6YknN+FDPta0=",
   "Source": "DATNBACK_END",
   "BasePath": "_content/DATNBACK_END",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
-  "Assets": []
+  "DiscoveryPatterns": [
+    {
+      "Name": "DATNBACK_END\\wwwroot",
+      "Source": "DATNBACK_END",
+      "ContentRoot": "D:\\DATN3D\\DATN_BE\\DATNBACK_END\\wwwroot\\",
+      "BasePath": "_content/DATNBACK_END",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "D:\\DATN3D\\DATN_BE\\DATNBACK_END\\wwwroot\\photo\\backgr1.png",
+      "SourceId": "DATNBACK_END",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\DATN3D\\DATN_BE\\DATNBACK_END\\wwwroot\\",
+      "BasePath": "_content/DATNBACK_END",
+      "RelativePath": "photo/backgr1.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\photo\\backgr1.png"
+    }
+  ]
 }

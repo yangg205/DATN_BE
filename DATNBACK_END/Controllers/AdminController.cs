@@ -1,87 +1,190 @@
-using Microsoft.AspNetCore.Mvc;
+using DATNBACK_END.Models;
+using DATNBACK_END.Service;
 using DATNBACK_END.Services;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Mvc;
+using MimeKit.Encodings;
 
-namespace DATNBACK_END.Controllers
+namespace DATNBACK_END.Controllers;
+
+public class AdminController : Controller
 {
-    public class AdminController : Controller
+    private readonly IPlayerService _playerservice;
+    public AdminController(IPlayerService playerService)
     {
-        private readonly IPlayerService _playerService;
-
-        public AdminController(IPlayerService playerService)
+        _playerservice = playerService;
+    }
+    [HttpGet]
+    public async Task<IActionResult> Index()
+    {
+        Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+        Response.Headers["Pragma"] = "no-cache";
+        Response.Headers["Expires"] = "0";
+        try
         {
-            _playerService = playerService;
-        }
-
-        // Trang chính: Đăng nhập & Đăng ký
-        [HttpGet]
-        public IActionResult Index()
-        {
+            //lay email nguoi choi tu Session 
+            var email = HttpContext.Session.GetString("email");
+            if (string.IsNullOrEmpty(email))
+            {
+                //chuyen huong ve login neu chua login
+                return RedirectToAction("LoginandRegister");
+            }
+            var player = await _playerservice.GetPlayersByEmail(email);
+            if (player == null)
+            {
+                return RedirectToAction("LoginandRegister");
+            }
+            ViewData["UserName"] = player.Name;
+            ViewData["UserBalance"] = player.Total_Money;
             return View();
         }
-
-        // Đăng nhập với Google
-        [HttpPost]
-        public IActionResult LoginWithGoogle()
+        catch (Exception e)
         {
-            var properties = new AuthenticationProperties
+            System.Console.WriteLine(e);
+            return StatusCode(500, e.Message);
+        }
+    }
+    [HttpGet]
+    public IActionResult LoginandRegister()
+    {
+        return View();
+    }
+    [HttpPost]
+    public async Task<IActionResult> Login(Player player)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(player.Email) || string.IsNullOrEmpty(player.Password))
             {
-                RedirectUri = Url.Action("GoogleCallback")
-            };
+                throw new Exception("du lieu trong");
+            }
+            var login = await _playerservice.Login(player.Email, player.Password);
+            // System.Console.WriteLine(email,password);
+            Console.WriteLine($"Login status: {login.status}");
+            if (login.status == true)
+            {
+                //luu email vao session
+                HttpContext.Session.SetString("email", player.Email);
+                Console.WriteLine($"Session Email: {player.Email}");
+                return RedirectToAction("Index");
+            }
+            ViewBag.message = login.message;
+            return View("LoginAndRegister");
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
+    }
+    [HttpPost]
+    [HttpPost]
+    public async Task<IActionResult> Register([FromBody] Dangky player)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(player.Email) || string.IsNullOrEmpty(player.Password) || string.IsNullOrEmpty(player.Repassword))
+            {
+                return Json(new { status = false, message = "Dữ liệu không hợp lệ" });
+            }
 
-            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+            var registerResult = await _playerservice.RegisterPendingPlayer(player.Email, player.Password, player.Repassword);
+
+            return Json(registerResult);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            return Json(new { status = false, message = "Đăng ký thất bại. Vui lòng thử lại." });
+        }
+    }
+
+    [HttpGet]
+    public IActionResult Recharge()
+    {
+        var email = HttpContext.Session.GetString("email");
+        if (string.IsNullOrEmpty(email))
+        {
+            return RedirectToAction("LoginAndRegister");
+        }
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> StartRecharge(decimal amount, [FromServices] IPaypalService paypalService)
+    {
+        var email = HttpContext.Session.GetString("email");
+        if (string.IsNullOrEmpty(email))
+        {
+            return RedirectToAction("LoginAndRegister");
+        }
+        try
+        {
+            // Gọi PayPal Service để tạo thanh toán
+            var approvalUrl = await paypalService.CreatePayment(amount, "USD", "Nạp tiền vào tài khoản game");
+            Console.WriteLine("Approval URL: " + approvalUrl);
+            if (!string.IsNullOrEmpty(approvalUrl))
+            {
+                return Redirect(approvalUrl); // Chuyển hướng tới PayPal
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "Không thể tạo thanh toán. Vui lòng thử lại.";
+                return View("Recharge");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            ViewBag.ErrorMessage = "Có lỗi xảy ra khi tạo thanh toán.";
+            return View("Recharge");
+        }
+    }
+
+
+    [HttpGet]
+    public async Task<IActionResult> ExecutePayment(string paymentId, string token, string PayerID, [FromServices] IPaypalService paypalService)
+    {
+        var email = HttpContext.Session.GetString("email");
+        if (string.IsNullOrEmpty(email))
+        {
+            return RedirectToAction("LoginAndRegister");
         }
 
-        // Xử lý callback từ Google
-        [HttpGet]
-        public async Task<IActionResult> GoogleCallback()
+        if (string.IsNullOrEmpty(paymentId) || string.IsNullOrEmpty(PayerID))
         {
-            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            if (!result.Succeeded)
-            {
-                ViewBag.Error = "Không thể đăng nhập bằng Google.";
-                return RedirectToAction("Index");
-            }
-
-            // Lấy thông tin user từ Google
-            var email = result.Principal.FindFirst(c => c.Type == "email")?.Value;
-            var name = result.Principal.FindFirst(c => c.Type == "name")?.Value;
-
-            if (email == null)
-            {
-                ViewBag.Error = "Không thể lấy thông tin email.";
-                return RedirectToAction("Index");
-            }
-
-            // Xử lý đăng nhập hoặc tạo tài khoản
-            var response = await _playerService.LoginWithGoogle(email, name);
-            if (!response.status)
-            {
-                ViewBag.Error = response.message;
-                return RedirectToAction("Index");
-            }
-
-            ViewBag.Success = "Đăng nhập thành công!";
+            TempData["ErrorMessage"] = "Thiếu thông tin giao dịch. Vui lòng thử lại.";
             return RedirectToAction("Index");
         }
 
-        // Xử lý đăng nhập thông thường
-        [HttpPost]
-        public async Task<IActionResult> Login(string email, string password)
+        try
         {
-            var response = await _playerService.Login(email, password);
-            if (!response.status)
+            var state = await paypalService.ExecutePayment(paymentId, PayerID, email);
+            if (state.ToLower() == "approved")
             {
-                ViewBag.Error = response.message;
-                return RedirectToAction("Index");
+                TempData["SuccessMessage"] = "Nạp tiền thành công!";
             }
-
-            ViewBag.Success = "Đăng nhập thành công!";
+            else
+            {
+                TempData["ErrorMessage"] = "Thanh toán không thành công.";
+            }
+            return RedirectToAction("Index"); // Chuyển hướng về trang Index
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            TempData["ErrorMessage"] = "Có lỗi xảy ra khi xử lý thanh toán.";
             return RedirectToAction("Index");
         }
+    }
 
+    [HttpGet]
+    public IActionResult Logout()
+    {
+        HttpContext.Session.Clear(); // Xóa session
+
+        // Chuyển hướng đến URL LoginAndRegister
+        return Redirect("/Admin/LoginandRegister");
     }
 }
+
+
+

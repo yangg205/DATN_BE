@@ -155,3 +155,16 @@ D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\Helpers\EmailService.cs
 D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\Helpers\PasswordHasher.cs
 D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\Template\login.html
 D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\Template\OTPTemplate.html
+D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\Microsoft.Extensions.Diagnostics.Abstractions.dll
+D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\Microsoft.Extensions.Hosting.Abstractions.dll
+D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\Microsoft.Extensions.ObjectPool.dll
+D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\System.Net.WebSockets.WebSocketProtocol.dll
+D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\APIMatic.Core.dll
+D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\Microsoft.Json.Pointer.dll
+D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\PayPal.dll
+D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\PayPalServerSDK.dll
+D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\Polly.dll
+D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\DATNBACK_END.staticwebassets.runtime.json

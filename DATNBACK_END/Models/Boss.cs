@@ -14,6 +14,4 @@ public class Boss
     public int? Location_x { get; set; }
     public int? Location_y { get; set; }
     public int? Location_z { get; set; }
-    public string? Status { get; set; }
-    public string? Phanbiet { get; set; }
 }

@@ -1,174 +1,354 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Portal</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: Arial, sans-serif;
-            color: white;
-        }
-
-        video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: -1;
-        }
-
-        .form-container {
-            background: rgba(0, 0, 0, 0.85);
-            padding: 20px;
-            border-radius: 10px;
-            width: 100%;
-            max-width: 400px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 2;
-        }
-
-        .form-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .btn-switch {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .btn-switch .btn {
-            flex: 1;
-            margin: 0 5px;
-        }
-
-        .field {
-            text-align: left;
-        }
-
-        #loginForm, #registerForm {
-            display: none;
-        }
-
-        .btn-primary, .btn-success {
-            background-color: #1d3557;
-            border: none;
-        }
-
-        .btn-primary:hover, .btn-success:hover {
-            background-color: #457b9d;
-        }
-
-        .btn-google {
-            background-color: #db4437;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-google img {
-            margin-right: 8px;
-        }
-
-        .btn-google:hover {
-            background-color: #c23321;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang Giới Thiệu Game</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Particles.js -->
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <!-- Three.js, OrbitControls, and GLTFLoader -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js"></script>
+  <!-- Custom CSS -->
+  <style>
+    body {
+      margin: 0;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      overflow-x: hidden;
+    }
+    #particles-js {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%);
+      z-index: -1;
+    }
+    .navbar {
+      background-color: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(5px);
+    }
+    .section {
+      padding: 80px 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    #home {
+      position: relative;
+    }
+    #three-canvas {
+      width: 100%;
+      height: 500px;
+      margin-bottom: 20px;
+      border: 2px solid #00ffcc;
+      z-index: 1;
+      background: rgba(0, 0, 0, 0.2);
+    }
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.5s ease-in;
+    }
+    .popup-content {
+      background: rgba(255, 255, 255, 0.95);
+      color: #333;
+      padding: 30px;
+      border-radius: 15px;
+      max-width: 600px;
+      width: 90%;
+      position: relative;
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.7);
+      transform: scale(0.7);
+      animation: popupScale 0.5s ease-out forwards;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 28px;
+      cursor: pointer;
+      color: #333;
+    }
+    .download-btn {
+      background: linear-gradient(45deg, #ff4b1f, #ff9068);
+      border: none;
+      padding: 12px 24px;
+      font-size: 18px;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .download-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(255, 105, 180, 0.8);
+    }
+    .form-container {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 30px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes popupScale {
+      from { transform: scale(0.7); }
+      to { transform: scale(1); }
+    }
+    #webgl-error {
+      color: red;
+      text-align: center;
+      display: none;
+    }
+  </style>
 </head>
 <body>
-    <video autoplay loop muted>
-        <source src="https://cdn.discordapp.com/attachments/111111111111111111/111111111111111111/elden-ring-bg.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
 
-    <div id="formContainer" class="form-container">
-        <div class="btn-switch">
-            <button id="switchToLogin" class="btn btn-primary">Login</button>
-            <button id="switchToRegister" class="btn btn-success">Register</button>
-        </div>
-        
-        <div id="loginForm">
-            <div class="form-header">
-                <h3>Login</h3>
-            </div>
-            <form action="/Admin/Login" method="post">
-                <div class="mb-3 field">
-                    <label for="loginEmail" class="form-label">Email</label>
-                    <input name="email" type="email" class="form-control" id="loginEmail" placeholder="Enter your email" required>
-                </div>
-                <div class="mb-3 field">
-                    <label for="loginPwd" class="form-label">Password</label>
-                    <input name="password" type="password" class="form-control" id="loginPwd" placeholder="Enter your password" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Login</button>
-                <button class="btn btn-google w-100 mt-3">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" width="20">
-                    Login with Google
-                </button>
-            </form>
-        </div>
-
-        <div id="registerForm">
-            <div class="form-header">
-                <h3>Register</h3>
-            </div>
-            <form action="/Admin/Register" method="post">
-                <div class="mb-3 field">
-                    <label for="registerName" class="form-label">Username</label>
-                    <input name="name" type="text" class="form-control" id="registerName" placeholder="Enter your username" required>
-                </div>
-                <div class="mb-3 field">
-                    <label for="registerEmail" class="form-label">Email</label>
-                    <input name="email" type="email" class="form-control" id="registerEmail" placeholder="Enter your email" required>
-                </div>
-                <div class="mb-3 field">
-                    <label for="registerPwd" class="form-label">Password</label>
-                    <input name="password" type="password" class="form-control" id="registerPwd" placeholder="Enter your password" required>
-                </div>
-                <button type="submit" class="btn btn-success w-100">Register</button>
-                <button class="btn btn-google w-100 mt-3">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" width="20">
-                    Login with Google
-                </button>
-            </form>
-        </div>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="#home">Game Của Bạn</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#home">Trang Chủ</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#about">Giới Thiệu</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#login">Đăng Nhập</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#register">Đăng Ký</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link download-btn text-white" href="#download">Tải Game</a>
+          </li>
+        </ul>
+      </div>
     </div>
+  </nav>
 
-    <script>
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-        const switchToLogin = document.getElementById('switchToLogin');
-        const switchToRegister = document.getElementById('switchToRegister');
+  <!-- Popup -->
+  <div class="popup" id="welcomePopup">
+    <div class="popup-content">
+      <span class="close-btn" onclick="closePopup()">×</span>
+      <h2>Chào Mừng Đến Với Game Của Bạn!</h2>
+      <p>Khám phá nhân vật chính của chúng tôi và tham gia cuộc phiêu lưu ngay hôm nay!</p>
+      <button class="btn btn-primary download-btn" onclick="closePopup()">Khám Phá Ngay</button>
+    </div>
+  </div>
 
-        switchToLogin.addEventListener('click', () => {
-            loginForm.style.display = 'block';
-            registerForm.style.display = 'none';
+  <!-- Home Section with 3D Character -->
+  <section id="home" class="section">
+    <div class="container text-center">
+      <h1>Chào Mừng Đến Với Game Của Bạn</h1>
+      <p>Tương tác với nhân vật chính của chúng tôi ngay trên web!</p>
+      <div id="webgl-error">Trình duyệt của bạn không hỗ trợ WebGL. Vui lòng sử dụng Chrome, Firefox hoặc Edge phiên bản mới nhất.</div>
+      <div id="three-canvas"></div>
+      <a href="#download" class="btn download-btn text-white">Tải Game Ngay</a>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="section">
+    <div class="container">
+      <h2>Giới Thiệu</h2>
+      <p>Game của bạn đưa người chơi vào một thế giới giả tưởng 3D sống động, nơi họ có thể chiến đấu, khám phá và xây dựng đội ngũ của mình. Gặp gỡ nhân vật chính với thiết kế giáp chi tiết và sẵn sàng cho mọi thử thách!</p>
+      <p>Điểm nổi bật: Tương tác 3D thời gian thực, nhân vật tùy chỉnh, và cốt truyện lôi cuốn.</p>
+    </div>
+  </section>
+
+  <!-- Login Section -->
+  <section id="login" class="section">
+    <div class="container form-container">
+      <h2>Đăng Nhập</h2>
+      <form>
+        <div class="mb-3">
+          <label for="loginEmail" class="form-label">Email</label>
+          <input type="email" class="form-control" id="loginEmail" placeholder="Nhập email">
+        </div>
+        <div class="mb-3">
+          <label for="loginPassword" class="form-label">Mật Khẩu</label>
+          <input type="password" class="form-control" id="loginPassword" placeholder="Nhập mật khẩu">
+        </div>
+        <button type="submit" class="btn btn-primary download-btn">Đăng Nhập</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Register Section -->
+  <section id="register" class="section">
+    <div class="container form-container">
+      <h2>Đăng Ký</h2>
+      <form>
+        <div class="mb-3">
+          <label for="registerUsername" class="form-label">Tên Người Dùng</label>
+          <input type="text" class="form-control" id="registerUsername" placeholder="Nhập tên người dùng">
+        </div>
+        <div class="mb-3">
+          <label for="registerEmail" class="form-label">Email</label>
+          <input type="email" class="form-control" id="registerEmail" placeholder="Nhập email">
+        </div>
+        <div class="mb-3">
+          <label for="registerPassword" class="form-label">Mật Khẩu</label>
+          <input type="password" class="form-control" id="registerPassword" placeholder="Nhập mật khẩu">
+        </div>
+        <button type="submit" class="btn btn-primary download-btn">Đăng Ký</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Download Section -->
+  <section id="download" class="section">
+    <div class="container text-center">
+      <h2>Tải Game</h2>
+      <p>Nhấn vào nút dưới đây để tải game và bắt đầu cuộc phiêu lưu!</p>
+      <a href="#" class="btn download-btn text-white">Tải Game Ngay</a>
+    </div>
+  </section>
+
+  <!-- Bootstrap JS and Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+  <!-- Custom JS -->
+  <script>
+    // Particles.js Config
+    particlesJS("particles-js", {
+      particles: {
+        number: { value: 100, density: { enable: true, value_area: 800 } },
+        color: { value: "#00ffcc" },
+        shape: { type: "circle" },
+        opacity: { value: 0.6, random: true },
+        size: { value: 4, random: true },
+        line_linked: { enable: true, distance: 120, color: "#00ffcc", opacity: 0.4, width: 1 },
+        move: { enable: true, speed: 3, direction: "none", random: true }
+      },
+      interactivity: {
+        detect_on: "canvas",
+        events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" } },
+        modes: { repulse: { distance: 100 }, push: { particles_nb: 4 } }
+      },
+      retina_detect: true
+    });
+
+    // Check WebGL support
+    if (!window.WebGLRenderingContext || !document.createElement('canvas').getContext('webgl')) {
+      document.getElementById('webgl-error').style.display = 'block';
+      document.getElementById('three-canvas').style.display = 'none';
+    } else {
+      // Three.js 3D Scene
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 500, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(window.innerWidth, 500);
+      document.getElementById('three-canvas').appendChild(renderer.domElement);
+
+      // Load the character model from local folder
+      const loader = new THREE.GLTFLoader();
+      loader.load(
+        'glb/Player_Knight.glb', // Thay bằng tên file .glb của bạn (ví dụ: player_model.glb)
+        (gltf) => {
+          const model = gltf.scene;
+          model.scale.set(0.1, 0.1, 0.1); // Thu nhỏ mô hình để thử
+          model.position.set(0, 0, 0); // Đặt ở trung tâm
+          scene.add(model);
+
+          // Log thông tin để debug
+          console.log('Mô hình đã tải thành công:', model);
+
+          // Add lighting
+          const pointLight = new THREE.PointLight(0xffffff, 1, 100);
+          pointLight.position.set(5, 5, 5);
+          scene.add(pointLight);
+          const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+          scene.add(ambientLight);
+
+          // Add directional light for better shading
+          const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+          directionalLight.position.set(-5, 5, 5);
+          scene.add(directionalLight);
+        },
+        (xhr) => {
+          console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        },
+        (error) => {
+          console.error('Lỗi khi tải mô hình:', error);
+          document.getElementById('webgl-error').textContent = 'Không thể tải mô hình 3D. Vui lòng kiểm tra đường dẫn file hoặc file có lỗi.';
+          document.getElementById('webgl-error').style.display = 'block';
+        }
+      );
+
+      // Add OrbitControls for interaction
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.screenSpacePanning = false;
+      controls.minDistance = 1;
+      controls.maxDistance = 10;
+
+      camera.position.z = 5;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        if (scene.children.length > 0) {
+          scene.children.forEach(child => {
+            if (child.isGroup) {
+              child.rotation.y += 0.01; // Rotate the loaded model
+            }
+          });
+        }
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      // Handle window resize
+      window.addEventListener('resize', () => {
+        renderer.setSize(window.innerWidth, 500);
+        camera.aspect = window.innerWidth / 500;
+        camera.updateProjectionMatrix();
+      });
+    }
+
+    // Show popup on page load
+    window.onload = function() {
+      document.getElementById('welcomePopup').style.display = 'flex';
+    };
+
+    // Close popup
+    function closePopup() {
+      document.getElementById('welcomePopup').style.display = 'none';
+    }
+
+    // Smooth scrolling for nav links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
         });
-
-        switchToRegister.addEventListener('click', () => {
-            loginForm.style.display = 'none';
-            registerForm.style.display = 'block';
-        });
-
-        // Default to login form
-        loginForm.style.display = 'block';
-    </script>
+      });
+    });
+  </script>
 </body>
 </html>

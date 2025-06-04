@@ -1,8 +1,10 @@
 using DATNBACK_END.Models;
+using DATNBACK_END.Models.modelTemp;
 using DATNBACK_END.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DATNBACK_END.Controllers;
+
 [Controller]
 public class Player_CharactersController : ControllerBase
 {
@@ -32,11 +34,11 @@ public class Player_CharactersController : ControllerBase
     }
     [HttpPost]
     [Route("/ContinueGame")]
-    public async Task<IActionResult> ContinueGame([FromBody] PlayerId_CharacterId playerId_CharacterId)
+    public async Task<IActionResult> ContinueGame([FromQuery] int playerId_CharacterId)
     {
         try
         {
-            var result = await _playerCharacterService.ContinueGame(playerId_CharacterId.Player_id, playerId_CharacterId.Character_id);
+            var result = await _playerCharacterService.ContinueGame(playerId_CharacterId);
             return Ok(new
             {
                 data = result
@@ -100,11 +102,11 @@ public class Player_CharactersController : ControllerBase
     }
     [HttpPost]
     [Route("UpdateSkill")]
-    public async Task<IActionResult> UpdateSkill([FromQuery] int playerCharacterId, [FromQuery] int skillTreeId)
+    public async Task<IActionResult> UpdateSkill([FromBody] UpdateSkill updateSkill)
     {
         try
         {
-            var result = await _playerCharacterSkillService.UpdateSkill(playerCharacterId, skillTreeId);
+            var result = await _playerCharacterSkillService.UpdateSkill(updateSkill.PlayerCharacterId, updateSkill.SkillTreeId);
             return Ok(new { data = result });
         }
         catch (Exception e)
@@ -112,5 +114,60 @@ public class Player_CharactersController : ControllerBase
             return StatusCode(500, e.Message);
         }
     }
-
+    [HttpPost]
+    [Route("UpdateSkillPoint")]
+    public async Task<IActionResult> UpdateSkillPoint([FromBody] PLayerCharacterUpdatePoint playerCharacter)
+    {
+        try
+        {
+            var result = await _playerCharacterService.UpdateSkillPoint(playerCharacter.PlayerCharacterId, playerCharacter.Point);
+            return Ok(new { data = result });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
+    }
+    [HttpGet]
+    [Route("RankingPlayerCharacter/{Character_id}")]
+    public async Task<IActionResult> RankingPlayerCharacter(int Character_id)
+    {
+        try
+        {
+            var result = await _playerCharacterService.RankingPlayerCharacter(Character_id);
+            return Ok(new { data = result });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
+    }
+    [HttpGet]
+    [Route("GetSkillPoint/{Player_Character_id}")]
+    public async Task<IActionResult> GetSkillPoint(int Player_Character_id)
+    {
+        try
+        {
+            var result = await _playerCharacterService.GetSkillPoint(Player_Character_id);
+            return Ok(new { data = result });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
+    }
+    [HttpDelete]
+    [Route("DeleteSkill/{Player_Characters_id}/{skill_tree_id}")]
+    public async Task<IActionResult> DeleteSkill(int Player_Characters_id, int skill_tree_id)
+    {
+        try
+        {
+            var result = await _playerCharacterSkillService.DeleteSkill(Player_Characters_id, skill_tree_id);
+            return Ok(new { data = result });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
+    }
 }

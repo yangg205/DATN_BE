@@ -11,7 +11,7 @@ public class PlayerService : IPlayerService
     private readonly AppDataContexts.AppDataContext _context;
     private readonly IEmailService _emailservice;
 
-    public PlayerService(AppDataContexts.AppDataContext context, IEmailService emailService)
+    public PlayerService(AppDataContexts.AppDataContext context, IEmailService emailService )
     {
         _context = context;
         _emailservice = emailService;
@@ -116,10 +116,11 @@ public class PlayerService : IPlayerService
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
             };
+
             _context.Player.Add(newPlayer);
             _context.PendingPlayer.Remove(checkPendingPlayer);
             await _context.SaveChangesAsync();
-            return new ReturnPlayer { status = true, message = "Đăng ký thành công" };
+            return new ReturnPlayer { status = true, message = "Đăng ký thành công"};
         }
         catch (Exception e)
         {
@@ -247,14 +248,14 @@ public class PlayerService : IPlayerService
             return new ReturnPlayer { status = false, message = "Lỗi hệ thống khi xác thực Google" };
         }
     }
-    public Task<Player> GetPlayersByEmail(string email)
+    public async Task<Player> GetPlayersByEmail(string email)
     {
         try
         {
             var existingPlayer = _context.Player.FirstOrDefault(x => x.Email == email);
             if (existingPlayer == null)
             {
-                return Task.FromResult(new Player { });
+                return await Task.FromResult(new Player { });
             }
             var player = new Player
             {
@@ -263,7 +264,7 @@ public class PlayerService : IPlayerService
                 Name = existingPlayer.Name,
                 Total_Money = existingPlayer.Total_Money,
             };
-            return Task.FromResult(player);
+            return await Task.FromResult(player);
         }
         catch (Exception e)
         {
@@ -287,6 +288,27 @@ public class PlayerService : IPlayerService
         {
             System.Console.WriteLine(e.Message);
             return false;
+        }
+    }
+    public async Task<ReturnPlayer> Updatemoney(string email,decimal amount){
+        try{
+            var player = _context.Player.FirstOrDefault(x => x.Email == email);
+            if (player == null)
+            {
+                return new ReturnPlayer { status = false, message = "Người chơi không tồn tại" };
+            }
+            player.Total_Money += amount;
+            _context.Player.Update(player);
+            _context.SaveChanges();
+            var obj = new Player{
+                Email = player.Email,
+                Total_Money = player.Total_Money
+            };
+            return new ReturnPlayer { status = true, message = "Cập nhật tiền thành công", Player = obj };
+        }
+        catch(Exception e){
+            System.Console.WriteLine(e.Message);
+            return new ReturnPlayer { status = false, message = "Lỗi hệ thống khi cập nhật tiền" };
         }
     }
 }

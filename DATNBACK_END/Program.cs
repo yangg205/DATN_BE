@@ -11,6 +11,11 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load config từ appsettings.json
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+
+// Cấu hình dịch vụ
 builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSession(options =>
@@ -20,68 +25,74 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-var environment = builder.Environment;
-
-// Thêm cấu hình từ `appsettings.json` và `appsettings.Development.json`
-builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                     .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
-                     
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllersWithViews();
 
-builder.Services.Configure<DbSetting>
-    (builder.Configuration.GetSection("DbSetting"));
-builder.Services.Configure<EmailSetting>
-    (builder.Configuration.GetSection("EmailSetting"));
-// builder.Services.AddSingleton<AppDataContext>();
+// Cấu hình DbSetting
+builder.Services.Configure<DbSetting>(builder.Configuration.GetSection("DbSetting"));
+builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSetting"));
 
+// Kết nối database
 builder.Services.AddDbContext<AppDataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DbSetting:ConnectionString")));
 
-
-builder.Services.AddScoped<IPlayerService,PlayerService>();
+// Đăng ký dịch vụ DI
+builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddScoped<IPlayerCharacterService,PlayerCharacterService>();
-builder.Services.AddScoped<IPlayerCharacterSkillService,PlayerCharacterSkillService>();
-// "DbSetting": {
-//     "ConnectionString": "Data Source=SQL1001.site4now.net;Initial Catalog=db_ab18c1_3dnangcao;User Id=db_ab18c1_3dnangcao_admin;Password=yangg2206"
-//   },
+builder.Services.AddScoped<IPlayerCharacterService, PlayerCharacterService>();
+builder.Services.AddScoped<IPlayerCharacterSkillService, PlayerCharacterSkillService>();
+
+// ✅ Thêm SignalR
+builder.Services.AddSignalR();
+
+// ✅ Thêm CORS (cho phép từ mọi nguồn)
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 var app = builder.Build();
 
+// Tạo DB scope nếu cần (hiện đoạn này chưa có tác dụng)
+using (var scope = app.Services.CreateScope())
 {
-    using var score = app.Services.CreateScope();
-    var context = score.ServiceProvider;
+    var context = scope.ServiceProvider;
 }
 
-
-// Configure the HTTP request pipeline.
+// Middleware pipeline
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-        c.RoutePrefix = "swagger"; // Swagger hiển thị tại /swagger
+        c.RoutePrefix = "swagger";
     });
 }
 
-
+// Các middleware quan trọng cần đúng thứ tự
 app.UseHttpsRedirection();
-app.MapControllers();
-
-app.UseCors(x=>x
-    .AllowAnyOrigin()
-    .AllowAnyMethod()
-    .AllowAnyHeader());
-
 app.UseStaticFiles();
-app.UseRouting();
+
+app.UseRouting();               // ✅ PHẢI đặt trước UseCors, UseSession, MapHub
+app.UseCors();                  // ✅ CORS áp dụng toàn cục
+app.UseSession();              // ✅ Session cần đặt sau UseRouting
+
+// Nếu có xác thực thì thêm:
+// app.UseAuthentication();
+// app.UseAuthorization();
+
+app.MapControllers();           // ✅ API
+app.MapHub<GameHub>("/gamehub"); // ✅ SignalR Hub
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Admin}/{action=LoginAndRegister}/{id?}");
 
-app.UseSession();
 app.Run();
