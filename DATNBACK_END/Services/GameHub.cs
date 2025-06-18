@@ -37,9 +37,9 @@ public class GameHub : Hub
     {
         return await _playerCharacterService.SaveGame(playerCharacters);
     }
-    public async Task<ReturnPlayerCharacter> ContinueGame(int playerCharacterId)
+    public async Task<ReturnPlayerCharacter> ContinueGame(int playerId, int characterId)
     {
-        return await _playerCharacterService.ContinueGame(playerCharacterId);
+        return await _playerCharacterService.ContinueGame(playerId, characterId);
     }
     public async Task<ReturnPlayerCharacter> SelectCharacter(int playerId, int characterId)
     {
@@ -61,4 +61,16 @@ public class GameHub : Hub
     {
         return await _playerService.GetPlayersByEmail(email);
     }
+    public async Task<ReturnPlayer> UpdateName(string email, string newName)
+    {
+        return await _playerService.UpdateName(email, newName);
+    }
+    public async Task<ReturnPlayer> ResetPass(string email, string passsword, string newpassword, string renewpassword)
+    {
+        return await _playerService.ResetPassword(email, passsword, newpassword, renewpassword);
+    }
+    public async Task<ReturnPlayerCharacter> SelectedCharacter(int playerId, int characterId)
+    {
+        return await _playerCharacterService.SelectedCharacter(playerId, characterId);
+    }  
 }

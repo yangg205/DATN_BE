@@ -20,28 +20,28 @@ public class PlayerCharacterSkillService : IPlayerCharacterSkillService
             var PC = await _context.Player_Characters.FirstOrDefaultAsync(x => x.Player_Character_id == Player_Characters_id);
             if (PC == null)
             {
-                return new ReturnPlayerCharacterSkill
+                return await Task.FromResult(new ReturnPlayerCharacterSkill
                 {
                     status = false,
                     message = "Nhân vật không tồn tại"
-                };
+                });
             }
             if (PC.Skill_Point < 1)
             {
-                return new ReturnPlayerCharacterSkill
+                return await Task.FromResult(new ReturnPlayerCharacterSkill
                 {
                     status = false,
                     message = "Không đủ điểm đề nâng cấp skill"
-                };
+                });
             }
             var skill_tree = await _context.Skill_tree.FirstOrDefaultAsync(x => x.Skill_tree_id == skill_tree_id && x.Characters_id == PC.Characters_id);
             if (skill_tree == null)
             {
-                return new ReturnPlayerCharacterSkill
+                return await Task.FromResult(new ReturnPlayerCharacterSkill
                 {
                     status = false,
                     message = "Skill không tồn tại trong skill tree của nhân vật"
-                };
+                });
             }
             // Kiểm tra skill cha (nếu có)
             if (skill_tree.Id_parent != null)
@@ -50,11 +50,11 @@ public class PlayerCharacterSkillService : IPlayerCharacterSkillService
                     .AnyAsync(pcs => pcs.Player_Character_id == Player_Characters_id && pcs.Skill_tree_id == skill_tree.Id_parent);
                 if (!parentSkillUnlocked)
                 {
-                    return new ReturnPlayerCharacterSkill
+                    return await Task.FromResult(new ReturnPlayerCharacterSkill
                     {
                         status = false,
                         message = "Vui lòng mở khóa skill cha trước"
-                    };
+                    });
                 }
             }
 
@@ -63,11 +63,11 @@ public class PlayerCharacterSkillService : IPlayerCharacterSkillService
                 .AnyAsync(pcs => pcs.Player_Character_id == Player_Characters_id && pcs.Skill_tree_id == skill_tree_id);
             if (isSkillUnlocked)
             {
-                return new ReturnPlayerCharacterSkill
+                return await Task.FromResult(new ReturnPlayerCharacterSkill
                 {
                     status = false,
                     message = "Skill đã được mở khóa"
-                };
+                });
             }
 
             // Giảm Skill_Point
@@ -85,22 +85,22 @@ public class PlayerCharacterSkillService : IPlayerCharacterSkillService
             _context.Player_Characters.Update(PC);
             await _context.SaveChangesAsync();
 
-            return new ReturnPlayerCharacterSkill
+            return await Task.FromResult(new ReturnPlayerCharacterSkill
             {
                 status = true,
                 message = "Nâng cấp skill thành công",
                 Player_Character_Skill = playerSkill
-            };
+            });
         }
         catch (Exception e)
         {
             System.Console.WriteLine(e.Message);
             System.Console.WriteLine(e.InnerException);
-            return new ReturnPlayerCharacterSkill
+            return await Task.FromResult(new ReturnPlayerCharacterSkill
             {
                 status = false,
                 message = "Lỗi hệ thống khi UPDATESKILL"
-            };
+            });
         }
     }
     public async Task<bool> DeleteSkill(int Player_Characters_id, int skill_tree_id)

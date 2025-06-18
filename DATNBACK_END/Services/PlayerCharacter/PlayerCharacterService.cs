@@ -35,29 +35,29 @@ public class PlayerCharacterService : IPlayerCharacterService
                 await _context.Player_Characters.AddAsync(player_Characters);
             }
             await _context.SaveChangesAsync();
-            return new ReturnPlayerCharacter
+            return await Task.FromResult(new ReturnPlayerCharacter
             {
                 status = true,
                 message = "Save game thành công"
-            };
+            });
 
         }
         catch (Exception e)
         {
             System.Console.WriteLine(e.Message);
             System.Console.WriteLine(e.InnerException);
-            return new ReturnPlayerCharacter
+            return await Task.FromResult(new ReturnPlayerCharacter
             {
                 status = false,
                 message = "Lỗi hệ thống khi SAVE"
-            };
+            });
         }
     }
-    public async Task<ReturnPlayerCharacter> ContinueGame(int playerCharacterId)
+    public async Task<ReturnPlayerCharacter> ContinueGame(int playerId, int characterId)
     {
         try
         {
-            var PC = await _context.Player_Characters.FirstOrDefaultAsync(x => x.Player_Character_id == playerCharacterId);
+            var PC = await _context.Player_Characters.FirstOrDefaultAsync(x => x.Player_id == playerId && x.Characters_id == characterId);
             if (PC == null)
             {
                 return await Task.FromResult(new ReturnPlayerCharacter
@@ -66,7 +66,7 @@ public class PlayerCharacterService : IPlayerCharacterService
                     message = "Không có dữ liệu game"
                 });
             }
-            return new ReturnPlayerCharacter
+            return await Task.FromResult(new ReturnPlayerCharacter
             {
                 status = true,
                 message = "Dữ liệu đã load thành công",
@@ -85,16 +85,16 @@ public class PlayerCharacterService : IPlayerCharacterService
                     Position_y = PC.Position_y,
                     Position_z = PC.Position_z
                 }
-            };
+            });
         }
         catch (Exception e)
         {
             System.Console.WriteLine(e);
-            return new ReturnPlayerCharacter
+            return await Task.FromResult(new ReturnPlayerCharacter
             {
                 status = false,
                 message = "Lỗi hệ thống, không thể load game"
-            };
+            });
         }
         ;
     }
@@ -108,33 +108,33 @@ public class PlayerCharacterService : IPlayerCharacterService
 
             if (player == null)
             {
-                return new ReturnPlayerCharacter
+                return await Task.FromResult(new ReturnPlayerCharacter
                 {
                     status = false,
                     message = "Player không tồn tại"
-                };
+                });
             }
             var character = await _context.Characters
                 .FirstOrDefaultAsync(c => c.Characters_id == Character_id);
 
             if (character == null)
             {
-                return new ReturnPlayerCharacter
+                return await Task.FromResult(new ReturnPlayerCharacter
                 {
                     status = false,
                     message = "Nhân vật không tồn tại"
-                };
+                });
             }
             var existingSelection = await _context.Player_Characters
                 .FirstOrDefaultAsync(pc => pc.Player_id == Player_id && pc.Characters_id == Character_id);
 
             if (existingSelection != null)
             {
-                return new ReturnPlayerCharacter
+                return await Task.FromResult(new ReturnPlayerCharacter
                 {
                     status = false,
                     message = "Nhân vật này đã được chọn"
-                };
+                });
             }
 
             // Tạo bản ghi mới trong Player_Characters
@@ -158,21 +158,21 @@ public class PlayerCharacterService : IPlayerCharacterService
             _context.Player_Characters.Add(playerCharacter);
             await _context.SaveChangesAsync();
 
-            return new ReturnPlayerCharacter
+            return await Task.FromResult(new ReturnPlayerCharacter
             {
                 status = true,
                 message = "Chọn nhân vật thành công",
                 player_Characters = playerCharacter
-            };
+            });
         }
         catch (Exception e)
         {
             System.Console.WriteLine(e.Message);
-            return new ReturnPlayerCharacter
+            return await Task.FromResult(new ReturnPlayerCharacter
             {
                 status = false,
                 message = "Lỗi khi chọn nhân vật"
-            };
+            });
         }
     }
     public async Task<bool> DeleteAllPlayerCharacter()
@@ -297,6 +297,35 @@ public class PlayerCharacterService : IPlayerCharacterService
         {
             System.Console.WriteLine(e.Message);
             throw new Exception("Lỗi hệ thống khi lấy Skill Point");
+        }
+    }
+    public async Task<ReturnPlayerCharacter> SelectedCharacter(int Player_id, int Character_id)
+    {
+        try
+        {
+            var playercharacter = await _context.Player_Characters.FirstOrDefaultAsync(p => p.Player_id == Player_id && p.Characters_id == Character_id);
+            if (playercharacter == null)
+            {
+                return await Task.FromResult(new ReturnPlayerCharacter
+                {
+                    status = false,
+                    message = "Người chơi chưa chọn nhân vật này"
+                });
+            }
+            return await Task.FromResult(new ReturnPlayerCharacter
+            {
+                status = true,
+                message = $"bạn đã chọn nhân vật có id là {Character_id}"
+            });
+        }
+        catch (Exception e)
+        {
+            System.Console.WriteLine(e.Message);
+            return await Task.FromResult(new ReturnPlayerCharacter
+            {
+                status = false,
+                message = "Lỗi hệ thống"
+            });
         }
     }
 

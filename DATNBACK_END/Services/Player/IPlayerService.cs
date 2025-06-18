@@ -12,4 +12,6 @@ public interface IPlayerService
     Task<Player> GetPlayersByEmail(string email);
     Task<bool> deletePlayer(string email);
     Task<ReturnPlayer> Updatemoney(string email, decimal amount);
+    Task<ReturnPlayer> ResetPassword(string email, string password, string newpassword, string renewpassword);
+    Task<ReturnPlayer> UpdateName(string email, string newname);
 }

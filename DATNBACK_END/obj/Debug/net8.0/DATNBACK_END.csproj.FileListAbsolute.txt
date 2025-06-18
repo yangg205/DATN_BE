@@ -164,7 +164,10 @@ D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
 D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\System.Net.WebSockets.WebSocketProtocol.dll
 D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\APIMatic.Core.dll
 D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\Microsoft.Json.Pointer.dll
-D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\PayPal.dll
 D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\PayPalServerSDK.dll
 D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\Polly.dll
 D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\DATNBACK_END.staticwebassets.runtime.json
+D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\PayPalCheckoutSdk.dll
+D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\PayPalHttp-Dotnet.dll
+D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\System.Diagnostics.DiagnosticSource.dll
+D:\DATN3D\DATN_BE\DATNBACK_END\bin\Debug\net8.0\NuGet.config

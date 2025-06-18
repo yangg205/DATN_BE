@@ -23,7 +23,6 @@ public class AppDataContext : DbContext
     public DbSet<Skill_tree> Skill_tree { get; set; }
     public DbSet<Player_Character_Skill> Player_Character_Skill { get; set; }
     public DbSet<Boss> Boss { get; set; }
-    public DbSet<Battle> Battle { get; set; }
     public DbSet<Player_Character_Battle> Player_Character_Battle { get; set; }
 
     //ket noi voi database
@@ -44,7 +43,6 @@ public class AppDataContext : DbContext
         modelBuilder.Entity<Achievement>().ToTable("Achievement").HasKey(x => x.Achievement_id);
         modelBuilder.Entity<Skill_tree>().ToTable("Skill_tree").HasKey(x => x.Skill_tree_id);
         modelBuilder.Entity<Boss>().ToTable("Boss").HasKey(x => x.Boss_id);
-        modelBuilder.Entity<Battle>().ToTable("Battle").HasKey(x => x.Battle_id);
         modelBuilder.Entity<Player_Character_Battle>().ToTable("Player_Character_Battle").HasKey(x => x.Player_battle_id);
         modelBuilder.Entity<PendingPlayer>().ToTable("PendingPlayer").HasKey(x => x.PendingPlayer_id);
     }

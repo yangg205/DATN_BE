@@ -8,8 +8,12 @@ using DATNBACK_END.Services;
 using DATNBACK_END.Helpers;
 using DATNBACK_END.AppDataContexts;
 using Microsoft.EntityFrameworkCore;
+using DATNBACK_END.Service;
+using DATNBACK_END.Services.Achievment;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Load config từ appsettings.json
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
@@ -42,7 +46,9 @@ builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IPlayerCharacterService, PlayerCharacterService>();
 builder.Services.AddScoped<IPlayerCharacterSkillService, PlayerCharacterSkillService>();
-
+builder.Services.AddScoped<IPlayerCharacterBattleService, PlayerCharacterBattleService>();
+builder.Services.AddScoped<IPaypalService, PaypalService>();
+builder.Services.AddScoped<IAchievmentService, AchievmentService>();
 // ✅ Thêm SignalR
 builder.Services.AddSignalR();
 
@@ -56,7 +62,7 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader();
     });
 });
-
+// builder.WebHost.UseUrls("http://*:80");
 var app = builder.Build();
 
 // Tạo DB scope nếu cần (hiện đoạn này chưa có tác dụng)

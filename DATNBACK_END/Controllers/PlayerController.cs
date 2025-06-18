@@ -1,4 +1,5 @@
 using DATNBACK_END.Models;
+using DATNBACK_END.Models.DTO.Auth;
 using DATNBACK_END.Models.modelTemp;
 using DATNBACK_END.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DATNBACK_END.Controllers;
 
 [ApiController]
-[Route("api/player")]
+[Route("player")]
 public class PlayerContoller : ControllerBase
 {
     private readonly IPlayerService _playerService;
@@ -96,6 +97,32 @@ public class PlayerContoller : ControllerBase
         try
         {
             var result = await _playerService.deletePlayer(email);
+            return Ok(new { data = result });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
+    }
+    [HttpPut("reset-password")]
+    public async Task<IActionResult> resetPass([FromBody] ResetPass resetPass)
+    {
+        try
+        {
+            var result = await _playerService.ResetPassword(resetPass.email, resetPass.passsword, resetPass.newpassword, resetPass.renewpassword);
+            return Ok(new { data = result });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
+    }
+    [HttpPut("Update-name")]
+        public async Task<IActionResult> resetPass([FromBody] NewName newName)
+    {
+        try
+        {
+            var result = await _playerService.UpdateName(newName.email,newName.newname);
             return Ok(new { data = result });
         }
         catch (Exception e)

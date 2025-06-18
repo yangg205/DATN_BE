@@ -141,40 +141,52 @@ public class AdminController : Controller
 
 
     [HttpGet]
-    public async Task<IActionResult> ExecutePayment(string paymentId, string token, string PayerID, [FromServices] IPaypalService paypalService)
+    public async Task<IActionResult> ExecutePayment(string token, [FromServices] IPaypalService paypalService)
+{
+        // Lấy email từ Session
+    
+    Console.WriteLine($"Controller ExecutePayment: token={token}");
+    var email = HttpContext.Session.GetString("email");
+    if (string.IsNullOrEmpty(email))
     {
-        var email = HttpContext.Session.GetString("email");
-        if (string.IsNullOrEmpty(email))
-        {
-            return RedirectToAction("LoginAndRegister");
-        }
-
-        if (string.IsNullOrEmpty(paymentId) || string.IsNullOrEmpty(PayerID))
-        {
-            TempData["ErrorMessage"] = "Thiếu thông tin giao dịch. Vui lòng thử lại.";
-            return RedirectToAction("Index");
-        }
-
-        try
-        {
-            var state = await paypalService.ExecutePayment(paymentId, PayerID, email);
-            if (state.ToLower() == "approved")
-            {
-                TempData["SuccessMessage"] = "Nạp tiền thành công!";
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Thanh toán không thành công.";
-            }
-            return RedirectToAction("Index"); // Chuyển hướng về trang Index
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error: {ex.Message}");
-            TempData["ErrorMessage"] = "Có lỗi xảy ra khi xử lý thanh toán.";
-            return RedirectToAction("Index");
-        }
+        // Nếu không có email, chuyển hướng về trang đăng nhập/đăng ký
+        return RedirectToAction("LoginAndRegister");
     }
+     Console.WriteLine($"Controller ExecutePayment: email from session={email}");
+    
+    
+    // Kiểm tra xem token (Order ID) có hợp lệ không
+        if (string.IsNullOrEmpty(token))
+        {
+            TempData["ErrorMessage"] = "Thiếu thông tin giao dịch PayPal. Vui lòng thử lại.";
+            return RedirectToAction("Index"); // Hoặc về trang nạp tiền
+        }
+
+    try
+    {
+        // Gọi paypalService.ExecutePayment.
+        // paymentId trong IPaypalService sẽ nhận giá trị của 'token' (là Order ID).
+        // PayerID không còn cần thiết cho Orders API v2, nhưng vẫn cần truyền vào để khớp chữ ký.
+        // Bạn có thể truyền một chuỗi rỗng hoặc null cho PayerID vì nó không được sử dụng.
+        var state = await paypalService.ExecutePayment(token, null, email); // PayerID được truyền là null hoặc string.Empty
+
+        if (state.ToLower() == "completed" || state.ToLower() == "approved") // Kiểm tra trạng thái "completed" hoặc "approved"
+        {
+            TempData["SuccessMessage"] = "Nạp tiền thành công! Số tiền đã được cộng vào tài khoản của bạn.";
+        }
+        else
+        {
+            TempData["ErrorMessage"] = $"Thanh toán không thành công. Trạng thái: {state}.";
+        }
+        return RedirectToAction("Index"); // Chuyển hướng về trang Index hoặc một trang thông báo kết quả
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error executing PayPal payment: {ex.Message}");
+        TempData["ErrorMessage"] = "Có lỗi xảy ra khi xử lý thanh toán PayPal. Vui lòng liên hệ hỗ trợ.";
+        return RedirectToAction("Index"); // Hoặc về trang lỗi
+    }
+}
 
     [HttpGet]
     public IActionResult Logout()

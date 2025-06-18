@@ -10,10 +10,12 @@ public class Player_CharactersController : ControllerBase
 {
     private readonly IPlayerCharacterService _playerCharacterService;
     private readonly IPlayerCharacterSkillService _playerCharacterSkillService;
-    public Player_CharactersController(IPlayerCharacterService playerCharacterService, IPlayerCharacterSkillService playerCharacterSkillService)
+    private readonly IPlayerCharacterBattleService _playerCharacterBattleService;
+    public Player_CharactersController(IPlayerCharacterService playerCharacterService, IPlayerCharacterSkillService playerCharacterSkillService, IPlayerCharacterBattleService playerCharacterBattleService)
     {
         _playerCharacterSkillService = playerCharacterSkillService;
         _playerCharacterService = playerCharacterService;
+        _playerCharacterBattleService = playerCharacterBattleService;
     }
     [HttpPost]
     [Route("/SaveGame")]
@@ -34,11 +36,11 @@ public class Player_CharactersController : ControllerBase
     }
     [HttpPost]
     [Route("/ContinueGame")]
-    public async Task<IActionResult> ContinueGame([FromQuery] int playerId_CharacterId)
+    public async Task<IActionResult> ContinueGame([FromQuery] int playerId, int characterId)
     {
         try
         {
-            var result = await _playerCharacterService.ContinueGame(playerId_CharacterId);
+            var result = await _playerCharacterService.ContinueGame(playerId,characterId);
             return Ok(new
             {
                 data = result
@@ -163,6 +165,34 @@ public class Player_CharactersController : ControllerBase
         try
         {
             var result = await _playerCharacterSkillService.DeleteSkill(Player_Characters_id, skill_tree_id);
+            return Ok(new { data = result });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
+    }
+    [HttpPost]
+    [Route("Battle")]
+    public async Task<IActionResult> Battle([FromBody] BattleRq battleRequest)
+    {
+        try
+        {
+            var result = await _playerCharacterBattleService.Battle(battleRequest.Player_Characters_id, battleRequest.Boss_id, battleRequest.Death, battleRequest.maxtime, battleRequest.realtime);
+            return Ok(new { data = result });
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
+    }
+    [HttpGet]
+    [Route("SelectedCharacter/{Player_id}/{Character_id}")]
+    public async Task<IActionResult> SelectedCharacter(int Player_id, int Character_id)
+    {
+        try
+        {
+            var result = await _playerCharacterService.SelectedCharacter(Player_id, Character_id);
             return Ok(new { data = result });
         }
         catch (Exception e)
