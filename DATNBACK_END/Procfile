@@ -1,1 +1,0 @@
-web: dotnet DATNBACK_END.dll --urls http://0.0.0.0:7102

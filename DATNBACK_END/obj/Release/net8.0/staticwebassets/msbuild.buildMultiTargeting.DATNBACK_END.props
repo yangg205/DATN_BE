@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\DATNBACK_END.props" />
-</Project>
