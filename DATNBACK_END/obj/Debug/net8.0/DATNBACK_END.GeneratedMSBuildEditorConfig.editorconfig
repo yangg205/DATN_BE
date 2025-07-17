@@ -17,3 +17,19 @@ build_property.SupportLocalizedComponentNames =
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
 build_property.MSBuildProjectDirectory = D:\DATN3D\DATN_BE\DATNBACK_END
 build_property._RazorSourceGeneratorDebug = 
+
+[D:/DATN3D/DATN_BE/DATNBACK_END/Views/Admin/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DATN3D/DATN_BE/DATNBACK_END/Views/Admin/LoginandRegister.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTG9naW5hbmRSZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DATN3D/DATN_BE/DATNBACK_END/Views/Admin/Recharge.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cUmVjaGFyZ2UuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DATN3D/DATN_BE/DATNBACK_END/Views/Share/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVcX0xheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
