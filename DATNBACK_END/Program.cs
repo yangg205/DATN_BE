@@ -16,7 +16,8 @@ using DATNBACK_END.Services.TransactionItem;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+// DB_LOCAL = Server=localhost;Database=DATN;User=sa;Password=123;TrustServerCertificate=True,
+// DB_SERVER = Data Source=SQL1004.site4now.net;Initial Catalog=db_abbe47_datndb;User Id=db_abbe47_datndb_admin;Password=yangg2206
 // Load config từ appsettings.json
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                      .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
