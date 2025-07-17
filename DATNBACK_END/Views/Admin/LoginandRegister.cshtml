@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background: url('/photo/backgr1.png') no-repeat center center;
+            background-size: cover;
+            color: white;
+        }
+        video {
+            display: none;
+        }
+        .form-container {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+        .form-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .toggle-buttons {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 2;
+        }
+        #closeForm {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            color: white;
+            cursor: pointer;
+            display: none;
+        }
+        .center-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Toggle Buttons -->
+    <div class="toggle-buttons">
+        <button id="showLogin" class="btn btn-primary">Login</button>
+        <button id="showRegister" class="btn btn-success">Register</button>
+    </div>
+
+    <!-- Center Button -->
+    <button id="downloadGame" class="btn btn-warning center-button">Download Game</button>
+
+    <!-- Form Container -->
+    <div id="formContainer" class="form-container">
+        <span id="closeForm">&times;</span>
+        <div class="form-header">
+            <h3 id="formTitle">Login</h3>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" action="/Admin/Login" method="post" style="display: block;">
+            <div class="mb-3">
+                <label for="loginEmail" class="form-label">Email</label>
+                <input name="email" type="email" class="form-control" id="loginEmail" placeholder="Enter your email" required>
+            </div>
+            <div class="mb-3">
+                <label for="loginPwd" class="form-label">Password</label>
+                <input name="password" type="password" class="form-control" id="loginPwd" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="registerForm" action="/Admin/Register" method="post" style="display: none;">
+            <div class="mb-3">
+                <label for="registerEmail" class="form-label">Email</label>
+                <input name="email" type="email" class="form-control" id="registerEmail" placeholder="Enter your email" required>
+            </div>
+            <div class="mb-3">
+                <label for="registerPwd" class="form-label">Password</label>
+                <input name="password" type="password" class="form-control" id="registerPwd" placeholder="Enter your password" required>
+            </div>
+            <div class="mb-3">
+                <label for="registerRepwd" class="form-label">Repassword</label>
+                <input name="repassword" type="password" class="form-control" id="registerRepwd" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn btn-success w-100">Register</button>
+            
+        </form>
+
+        <!-- OTP Form -->
+        <form id="otpForm" action="/Admin/VerifyOTP" method="post" style="display: none;">
+            <div class="mb-3">
+                <label for="otpCode" class="form-label">OTP Code</label>
+                <input name="otp" type="text" class="form-control" id="otpCode" placeholder="Enter your OTP" required>
+            </div>
+            <button type="submit" class="btn btn-warning w-100">Verify OTP</button>
+        </form>
+    </div>
+
+    <!-- JavaScript to toggle forms -->
+    <script>
+        const loginButton = document.getElementById('showLogin');
+        const registerButton = document.getElementById('showRegister');
+        const formContainer = document.getElementById('formContainer');
+        const closeForm = document.getElementById('closeForm');
+        const downloadGameButton = document.getElementById('downloadGame');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const otpForm = document.getElementById('otpForm');
+        const formTitle = document.getElementById('formTitle');
+
+        loginButton.addEventListener('click', () => {
+            formContainer.style.display = 'block';
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+            otpForm.style.display = 'none';
+            formTitle.textContent = 'Login';
+            closeForm.style.display = 'block';
+            downloadGameButton.style.display = 'none';
+        });
+
+        registerButton.addEventListener('click', () => {
+            formContainer.style.display = 'block';
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+            otpForm.style.display = 'none';
+            formTitle.textContent = 'Register';
+            closeForm.style.display = 'block';
+            downloadGameButton.style.display = 'none';
+        });
+
+        closeForm.addEventListener('click', () => {
+            formContainer.style.display = 'none';
+            closeForm.style.display = 'none';
+            downloadGameButton.style.display = 'block';
+        });
+
+        registerForm.addEventListener('submit', async (e) => {
+    e.preventDefault(); // Ngăn hành động mặc định của form
+
+    // Lấy giá trị từ form
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPwd').value;
+    const repassword = document.getElementById('registerRepwd').value;
+
+    try {
+        // Gửi yêu cầu POST tới API RegisterPendingPlayer
+        const response = await fetch('/Admin/Register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password, repassword }),
+        });
+
+        const result = await response.json();
+
+        if (result.status) {
+            // Nếu thành công, hiển thị form OTP
+            registerForm.style.display = 'none';
+            otpForm.style.display = 'block';
+            formTitle.textContent = 'Verify OTP';
+        } else {
+            // Nếu thất bại, hiển thị thông báo lỗi
+            alert(result.message);
+        }
+    } catch (error) {
+        console.error('Error during registration:', error);
+        alert('Đã xảy ra lỗi. Vui lòng thử lại.');
+    }
+});
+
+    </script>
+</body>
+</html>

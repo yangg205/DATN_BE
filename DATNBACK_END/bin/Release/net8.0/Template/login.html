@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        .form-container {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 20px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-switch {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .btn-switch .btn {
+            flex: 1;
+            margin: 0 5px;
+        }
+
+        .field {
+            text-align: left;
+        }
+
+        #loginForm, #registerForm {
+            display: none;
+        }
+
+        .btn-primary, .btn-success {
+            background-color: #1d3557;
+            border: none;
+        }
+
+        .btn-primary:hover, .btn-success:hover {
+            background-color: #457b9d;
+        }
+
+        .btn-google {
+            background-color: #db4437;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-google img {
+            margin-right: 8px;
+        }
+
+        .btn-google:hover {
+            background-color: #c23321;
+        }
+    </style>
+</head>
+<body>
+    <video autoplay loop muted>
+        <source src="https://cdn.discordapp.com/attachments/111111111111111111/111111111111111111/elden-ring-bg.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <div id="formContainer" class="form-container">
+        <div class="btn-switch">
+            <button id="switchToLogin" class="btn btn-primary">Login</button>
+            <button id="switchToRegister" class="btn btn-success">Register</button>
+        </div>
+        
+        <div id="loginForm">
+            <div class="form-header">
+                <h3>Login</h3>
+            </div>
+            <form action="/Admin/Login" method="post">
+                <div class="mb-3 field">
+                    <label for="loginEmail" class="form-label">Email</label>
+                    <input name="email" type="email" class="form-control" id="loginEmail" placeholder="Enter your email" required>
+                </div>
+                <div class="mb-3 field">
+                    <label for="loginPwd" class="form-label">Password</label>
+                    <input name="password" type="password" class="form-control" id="loginPwd" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+                <button class="btn btn-google w-100 mt-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" width="20">
+                    Login with Google
+                </button>
+            </form>
+        </div>
+
+        <div id="registerForm">
+            <div class="form-header">
+                <h3>Register</h3>
+            </div>
+            <form action="/Admin/Register" method="post">
+                <div class="mb-3 field">
+                    <label for="registerName" class="form-label">Username</label>
+                    <input name="name" type="text" class="form-control" id="registerName" placeholder="Enter your username" required>
+                </div>
+                <div class="mb-3 field">
+                    <label for="registerEmail" class="form-label">Email</label>
+                    <input name="email" type="email" class="form-control" id="registerEmail" placeholder="Enter your email" required>
+                </div>
+                <div class="mb-3 field">
+                    <label for="registerPwd" class="form-label">Password</label>
+                    <input name="password" type="password" class="form-control" id="registerPwd" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn btn-success w-100">Register</button>
+                <button class="btn btn-google w-100 mt-3">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" width="20">
+                    Login with Google
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const switchToLogin = document.getElementById('switchToLogin');
+        const switchToRegister = document.getElementById('switchToRegister');
+
+        switchToLogin.addEventListener('click', () => {
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+        });
+
+        switchToRegister.addEventListener('click', () => {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+        });
+
+        // Default to login form
+        loginForm.style.display = 'block';
+    </script>
+</body>
+</html>
