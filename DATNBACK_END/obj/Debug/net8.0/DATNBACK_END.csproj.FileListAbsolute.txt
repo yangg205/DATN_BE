@@ -128,7 +128,6 @@ D:\DATN3D\DATN_BE\DATNBACK_END\obj\Debug\net8.0\DATNBACK_END.AssemblyInfo.cs
 D:\DATN3D\DATN_BE\DATNBACK_END\obj\Debug\net8.0\DATNBACK_END.csproj.CoreCompileInputs.cache
 D:\DATN3D\DATN_BE\DATNBACK_END\obj\Debug\net8.0\DATNBACK_END.MvcApplicationPartsAssemblyInfo.cs
 D:\DATN3D\DATN_BE\DATNBACK_END\obj\Debug\net8.0\DATNBACK_END.MvcApplicationPartsAssemblyInfo.cache
-D:\DATN3D\DATN_BE\DATNBACK_END\obj\Debug\net8.0\DATNBACK_END.sourcelink.json
 D:\DATN3D\DATN_BE\DATNBACK_END\obj\Debug\net8.0\staticwebassets.build.json
 D:\DATN3D\DATN_BE\DATNBACK_END\obj\Debug\net8.0\staticwebassets.development.json
 D:\DATN3D\DATN_BE\DATNBACK_END\obj\Debug\net8.0\staticwebassets\msbuild.DATNBACK_END.Microsoft.AspNetCore.StaticWebAssets.props

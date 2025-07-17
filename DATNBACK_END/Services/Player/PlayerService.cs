@@ -1,22 +1,25 @@
-using System.Diagnostics;
+namespace DATNBACK_END.Services;
 using DATNBACK_END.Helpers;
 using DATNBACK_END.Models;
+using DATNBACK_END.Models.DTO.Transaction;
+using DATNBACK_END.Services.Item;
 using Google.Apis.Auth;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-
-namespace DATNBACK_END.Services;
 
 public class PlayerService : IPlayerService
 {
     private readonly AppDataContexts.AppDataContext _context;
     private readonly IEmailService _emailservice;
+    private readonly IItemService _itemService;
+    private readonly IPlayerCharacterService _playerCharacterService;
 
-    public PlayerService(AppDataContexts.AppDataContext context, IEmailService emailService)
+    public PlayerService(AppDataContexts.AppDataContext context, IEmailService emailService,
+                         IItemService itemService, IPlayerCharacterService playerCharacterService)
     {
         _context = context;
         _emailservice = emailService;
+        _itemService = itemService;
+        _playerCharacterService = playerCharacterService;
     }
 
     public string GenerateNumberOTP()
@@ -430,6 +433,122 @@ public class PlayerService : IPlayerService
                 status = false,
                 message = "Lỗi hệ thống khi đổi tên"
             });
+        }
+    }
+
+
+
+    //cham bai xong nen sua lai
+    public async Task<Player?> GetPlayerByIdAsync(int playerId)
+    {
+        return await _context.Player.FirstOrDefaultAsync(p => p.Player_id == playerId);
+    }
+
+    public async Task<ExchangeCurrencyResponseDTO> ExchangeCurrencyAsync(ExchangeCurrencyRequestDTO request)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            var player = await _context.Player.FirstOrDefaultAsync(p => p.Player_id == request.PlayerId);
+            var playerCharacter = await _playerCharacterService.GetPlayerCharacterByIdAsync(request.PlayerCharacterId);
+
+            if (player == null || playerCharacter == null)
+            {
+                return new ExchangeCurrencyResponseDTO { Success = false, Message = "Player or Player Character not found." };
+            }
+            // Đảm bảo Player và Player_Character liên kết với nhau qua Player_id
+            if (player.Player_id != playerCharacter.Player_id)
+            {
+                 return new ExchangeCurrencyResponseDTO { Success = false, Message = "Player and Player Character mismatch." };
+            }
+
+            // Lấy thông tin Item cho các loại tiền tệ nguồn và đích (Type = "currency")
+            var sourceCurrencyItem = await _itemService.GetCurrencyItemByNameAndTypeAsync(request.SourceCurrencyItemName, "currency");
+            var targetCurrencyItem = await _itemService.GetCurrencyItemByNameAndTypeAsync(request.TargetCurrencyItemName, "currency");
+
+            // Đảm bảo các Item tiền tệ tồn tại và có giá
+            if (sourceCurrencyItem == null || targetCurrencyItem == null || sourceCurrencyItem.Price == null || targetCurrencyItem.Price == null)
+            {
+                return new ExchangeCurrencyResponseDTO { Success = false, Message = "Invalid currency type for exchange (Item not found or price is invalid)." };
+            }
+
+            decimal currentSourceAmount;
+            if (sourceCurrencyItem.Name == "Money") // Item 'Money' <-> Player.Total_Money
+            {
+                currentSourceAmount = player.Total_Money ?? 0;
+            }
+            else if (sourceCurrencyItem.Name == "Coin") // Item 'Coin' <-> Player_Characters.Total_coin
+            {
+                currentSourceAmount = playerCharacter.Total_coin ?? 0;
+            }
+            else
+            {
+                return new ExchangeCurrencyResponseDTO { Success = false, Message = "Unsupported source currency type for exchange." };
+            }
+
+            if (currentSourceAmount < request.AmountToExchange)
+            {
+                return new ExchangeCurrencyResponseDTO { Success = false, Message = $"Insufficient {request.SourceCurrencyItemName}." };
+            }
+
+            decimal exchangeRate = sourceCurrencyItem.Price.Value / targetCurrencyItem.Price.Value;
+            decimal convertedAmount;
+            // Áp dụng tỷ giá cố định: 1 Money = 10000 Coin
+            if (request.SourceCurrencyItemName == "Money" && request.TargetCurrencyItemName == "Coin")
+            {
+                convertedAmount = request.AmountToExchange * 10000m; // 1 Money = 10000 Coin
+            }
+            else if (request.SourceCurrencyItemName == "Coin" && request.TargetCurrencyItemName == "Money")
+            {
+                convertedAmount = request.AmountToExchange / 10000m; // 1 Coin = 1/10000 Money
+            }
+            else
+            {
+                return new ExchangeCurrencyResponseDTO { Success = false, Message = "Exchange for these currency types is not configured with fixed rate." };
+            }
+
+
+            // Trừ tiền nguồn
+            if (sourceCurrencyItem.Name == "Money")
+            {
+                player.Total_Money -= request.AmountToExchange;
+                _context.Player.Update(player);
+            }
+            else if (sourceCurrencyItem.Name == "Coin")
+            {
+                // Cập nhật Total_coin của Player_Characters thông qua PlayerCharacterService
+                await _playerCharacterService.UpdatePlayerTotalCoinAsync(playerCharacter.Player_Character_id, -request.AmountToExchange);
+            }
+
+            // Thêm tiền đích
+            if (targetCurrencyItem.Name == "Money")
+            {
+                player.Total_Money += convertedAmount;
+                _context.Player.Update(player); 
+            }
+            else if (targetCurrencyItem.Name == "Coin")
+            {
+                // Cập nhật Total_coin của Player_Characters thông qua PlayerCharacterService
+                await _playerCharacterService.UpdatePlayerTotalCoinAsync(playerCharacter.Player_Character_id, convertedAmount); 
+            }
+            await _context.SaveChangesAsync(); 
+            await transaction.CommitAsync();
+            var updatedPlayer = await GetPlayerByIdAsync(request.PlayerId);
+            var updatedPlayerCharacter = await _playerCharacterService.GetPlayerCharacterByIdAsync(request.PlayerCharacterId);
+
+            return new ExchangeCurrencyResponseDTO
+            {
+                Success = true,
+                Message = $"Successfully exchanged {request.AmountToExchange} {request.SourceCurrencyItemName} for {convertedAmount} {request.TargetCurrencyItemName}.",
+                NewPlayerTotalMoney = updatedPlayer?.Total_Money ?? 0,
+                NewPlayerTotalCoin = updatedPlayerCharacter?.Total_coin ?? 0
+            };
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            // Log lỗi
+            return new ExchangeCurrencyResponseDTO { Success = false, Message = $"Exchange failed: {ex.Message}" };
         }
     }
 }

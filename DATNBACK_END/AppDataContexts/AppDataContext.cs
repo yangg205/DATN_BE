@@ -24,7 +24,10 @@ public class AppDataContext : DbContext
     public DbSet<Player_Character_Skill> Player_Character_Skill { get; set; }
     public DbSet<Boss> Boss { get; set; }
     public DbSet<Player_Character_Battle> Player_Character_Battle { get; set; }
-
+    public DbSet<Player_Achievement> Player_Achievement { get; set; }
+    public DbSet<TransactionItem> TransactionItem { get; set; }
+    public DbSet<Inventory> Inventory { get; set; }
+    public DbSet<Item> items { get; set; }
     //ket noi voi database
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -45,6 +48,11 @@ public class AppDataContext : DbContext
         modelBuilder.Entity<Boss>().ToTable("Boss").HasKey(x => x.Boss_id);
         modelBuilder.Entity<Player_Character_Battle>().ToTable("Player_Character_Battle").HasKey(x => x.Player_battle_id);
         modelBuilder.Entity<PendingPlayer>().ToTable("PendingPlayer").HasKey(x => x.PendingPlayer_id);
+        modelBuilder.Entity<Player_Achievement>().ToTable("Player_Achievement").HasKey(x => x.Player_Achievement_id);
+        modelBuilder.Entity<TransactionItem>().ToTable("TransactionItem").HasKey(x => x.TransactionItem_id);
+        modelBuilder.Entity<Inventory>().ToTable("Inventory").HasKey(x => x.Inventory_id);
+        modelBuilder.Entity<Item>().ToTable("Item").HasKey(x => x.Item_id);
+
     }
 
     internal class AppDataContexts { }

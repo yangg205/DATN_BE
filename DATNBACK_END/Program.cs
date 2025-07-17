@@ -10,6 +10,8 @@ using DATNBACK_END.AppDataContexts;
 using Microsoft.EntityFrameworkCore;
 using DATNBACK_END.Service;
 using DATNBACK_END.Services.Achievment;
+using DATNBACK_END.Services.Item;
+using DATNBACK_END.Services.TransactionItem;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,6 +51,8 @@ builder.Services.AddScoped<IPlayerCharacterSkillService, PlayerCharacterSkillSer
 builder.Services.AddScoped<IPlayerCharacterBattleService, PlayerCharacterBattleService>();
 builder.Services.AddScoped<IPaypalService, PaypalService>();
 builder.Services.AddScoped<IAchievmentService, AchievmentService>();
+builder.Services.AddScoped<IItemService, ItemService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
 // ✅ Thêm SignalR
 builder.Services.AddSignalR();
 

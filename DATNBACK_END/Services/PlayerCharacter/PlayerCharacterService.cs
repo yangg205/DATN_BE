@@ -1,4 +1,5 @@
 using DATNBACK_END.Models;
+using DATNBACK_END.Models.DTO.Transaction;
 using DATNBACK_END.Models.modelTemp;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
@@ -329,4 +330,111 @@ public class PlayerCharacterService : IPlayerCharacterService
         }
     }
 
+
+
+
+    //cham xong sua code
+    public async Task<Player_Characters?> GetPlayerCharacterByIdAsync(int playerCharacterId)
+    {
+        return await _context.Player_Characters.FirstOrDefaultAsync(pc => pc.Player_Character_id == playerCharacterId);
+    }
+
+    public async Task<bool> UpdatePlayerTotalCoinAsync(int playerCharacterId, decimal amountChange)
+    {
+        var playerCharacter = await _context.Player_Characters.FirstOrDefaultAsync(pc => pc.Player_Character_id == playerCharacterId);
+        // Đảm bảo Player_Characters và Total_coin không null trước khi cập nhật
+        if (playerCharacter == null || playerCharacter.Total_coin == null) return false;
+
+        playerCharacter.Total_coin += (int)amountChange; // Ép kiểu vì Total_coin là int?
+        _context.Player_Characters.Update(playerCharacter);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> AddOrUpdateInventoryItemAsync(int playerCharacterId, int itemId, int quantityChange)
+    {
+        if (quantityChange == 0) return true; // Không có thay đổi số lượng
+
+        try
+        {
+            var inventoryItem = await _context.Inventory
+                .FirstOrDefaultAsync(pi => pi.Player_CharacterId == playerCharacterId && pi.Item_id == itemId);
+
+            if (inventoryItem == null)
+            {
+                if (quantityChange > 0) // Chỉ thêm mới vào Inventory nếu số lượng tăng
+                {
+                    _context.Inventory.Add(new Inventory
+                    {
+                        Player_CharacterId = playerCharacterId,
+                        Item_id = itemId,
+                        Quantity = quantityChange
+                    });
+                }
+                else
+                {
+                    // Cố gắng trừ item không tồn tại trong Inventory
+                    return false;
+                }
+            }
+            else
+            {
+                inventoryItem.Quantity += quantityChange;
+                if (inventoryItem.Quantity < 0)
+                {
+                    inventoryItem.Quantity = 0; // Đảm bảo số lượng không âm
+                }
+                if (inventoryItem.Quantity == 0) // Xóa vật phẩm khỏi Inventory nếu hết
+                {
+                    _context.Inventory.Remove(inventoryItem);
+                }
+                else
+                {
+                    _context.Inventory.Update(inventoryItem); // Cập nhật trạng thái
+                }
+            }
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            System.Console.WriteLine($"Error in AddOrUpdateInventoryItemAsync: {ex.Message}");
+            return false;
+        }
+    }
+
+    public async Task<bool> ConsumeItemAsync(ConsumeItemRequestDTO request)
+    {
+        // Gọi lại phương thức AddOrUpdateInventoryItemAsync với số lượng âm
+        return await AddOrUpdateInventoryItemAsync(request.PlayerCharacterId, request.ItemId, -request.Quantity);
+    }
+
+    public async Task<List<PlayerInventoryItemDTO>> GetPlayerInventoryAsync(int playerCharacterId)
+    {
+        return await _context.Inventory
+                             .Where(pi => pi.Player_CharacterId == playerCharacterId && pi.Quantity > 0) // Chỉ lấy item có số lượng > 0
+                             .Join(_context.Item, // Join với bảng Item để lấy thông tin chi tiết về vật phẩm
+                                   pi => pi.Item_id,
+                                   item => item.Item_id,
+                                   (pi, item) => new PlayerInventoryItemDTO
+                                   {
+                                       ItemId = item.Item_id,
+                                       ItemName = item.Name ?? string.Empty,
+                                       ItemType = item.Type ?? string.Empty,
+                                       Quantity = pi.Quantity,
+                                       ItemDescription = item.Description
+                                   })
+                             .ToListAsync();
+    }
+        public async Task<bool> UpdatePlayerTotalMoneyAsync(int PlayerCharacterId, decimal amountChange)
+    {
+        var playercharacter = await _context.Player_Characters.FirstOrDefaultAsync(p => p.Player_Character_id == PlayerCharacterId);
+        // Đảm bảo Player và Total_Money không null trước khi cập nhật
+        if (playercharacter == null || playercharacter.Total_coin == null) return false;
+
+        playercharacter.Total_coin += (int)amountChange;
+        _context.Player_Characters.Update(playercharacter);
+        await _context.SaveChangesAsync();
+        return true;
+    }
 }

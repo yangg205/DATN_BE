@@ -1,6 +1,6 @@
-using DATNBACK_END.Models;
-
 namespace DATNBACK_END.Services;
+using DATNBACK_END.Models;
+using DATNBACK_END.Models.DTO.Transaction;
 
 public interface IPlayerService
 {
@@ -14,4 +14,13 @@ public interface IPlayerService
     Task<ReturnPlayer> Updatemoney(string email, decimal amount);
     Task<ReturnPlayer> ResetPassword(string email, string password, string newpassword, string renewpassword);
     Task<ReturnPlayer> UpdateName(string email, string newname);
+
+
+        // Lấy Player Model để truy cập Total_Money
+    Task<Player?> GetPlayerByIdAsync(int playerId);
+
+
+
+    // Xử lý đổi tiền (orchestrates calls to IPlayerCharacterService if involves Total_coin)
+    Task<ExchangeCurrencyResponseDTO> ExchangeCurrencyAsync(ExchangeCurrencyRequestDTO request);
 }

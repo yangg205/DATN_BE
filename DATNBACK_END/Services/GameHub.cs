@@ -2,20 +2,34 @@ using Microsoft.AspNetCore.SignalR;
 using DATNBACK_END.Services;
 using DATNBACK_END.Models.modelTemp;
 using DATNBACK_END.Models;
+using DATNBACK_END.Services.Achievment;
+using DATNBACK_END.Models.DTO;
+using DATNBACK_END.Services.Item;
+using DATNBACK_END.Services.TransactionItem;
+using DATNBACK_END.Models.DTO.Transaction;
 
 public class GameHub : Hub
 {
     private readonly IPlayerCharacterSkillService _playerCharacterSkillService;
     private readonly IPlayerCharacterService _playerCharacterService;
     private readonly IPlayerService _playerService;
+    private readonly IAchievmentService _achievmentService;
+    private readonly IItemService _itemService;
+    private readonly ITransactionService _transactionService;
 
     public GameHub(IPlayerCharacterSkillService playerCharacterSkillService,
                    IPlayerCharacterService playerCharacterService,
-                   IPlayerService playerService)
+                   IPlayerService playerService,
+                   IAchievmentService achievmentService
+                   , IItemService itemService,
+                   ITransactionService transactionService)
     {
         _playerCharacterService = playerCharacterService;
         _playerService = playerService;
         _playerCharacterSkillService = playerCharacterSkillService;
+        _achievmentService = achievmentService;
+        _itemService = itemService;
+        _transactionService = transactionService;
     }
     public async Task<ReturnPlayerCharacterSkill> UpdateSkill(int playerCharacterId, int skillTreeId)
     {
@@ -72,5 +86,37 @@ public class GameHub : Hub
     public async Task<ReturnPlayerCharacter> SelectedCharacter(int playerId, int characterId)
     {
         return await _playerCharacterService.SelectedCharacter(playerId, characterId);
-    }  
-}
+    }
+    public async Task<List<PlayerAchievementDto>> GetAllAchievements(int playerCharacterId)
+    {
+        return await _achievmentService.GetPlayerAchievementsAsync(playerCharacterId);
+    }
+    public async Task<PlayerAchievementDto> CompleteAchievement(int playerCharacterId, int achievementId)
+    {
+        return await _achievmentService.CompletePlayerAchievement(playerCharacterId, achievementId);
+    }
+    public async Task<BuyItemResponseDTO> BuyItem(BuyItemRequestDTO request)
+    {
+        return await _transactionService.ProcessPurchaseAsync(request);
+    }
+    public async Task<List<Item>> GetAllItems()
+    {
+        return await _itemService.GetAllItemsAsync();
+    }
+    public async Task<List<PlayerInventoryItemDTO>> GetInventory(int playerCharacterId)
+    {
+        return await _playerCharacterService.GetPlayerInventoryAsync(playerCharacterId);
+    }
+    public async Task<bool> AddOrUpdateInventoryItem(int playerCharacterId, int itemId, int quantityChange)
+    {
+        return await _playerCharacterService.AddOrUpdateInventoryItemAsync(playerCharacterId, itemId, quantityChange);
+    }
+    public async Task<bool> ConsumeItem(ConsumeItemRequestDTO request)
+    {
+        return await _playerCharacterService.ConsumeItemAsync(request);
+    }
+    public async Task<ExchangeCurrencyResponseDTO> ExchangeCurrency(ExchangeCurrencyRequestDTO request)
+    {
+        return await _playerService.ExchangeCurrencyAsync(request);
+    }
+}   
