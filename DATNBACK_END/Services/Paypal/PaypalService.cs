@@ -56,8 +56,8 @@ public class PaypalService : IPaypalService
                     LandingPage = "BILLING", // Trang đích trên PayPal (trang thanh toán/hóa đơn)
                     ShippingPreference = "NO_SHIPPING", // Không yêu cầu địa chỉ giao hàng
                     UserAction = "PAY_NOW", // Nút trên PayPal sẽ là "Pay Now"
-                    ReturnUrl = "http://localhost:7102/Admin/ExecutePayment", // URL sau khi thanh toán thành công
-                    CancelUrl = "http://localhost:7102/Admin/Recharge" // URL nếu người dùng hủy
+                    ReturnUrl = "https://datn-be-oygi.onrender.com/Admin/ExecutePayment", // URL sau khi thanh toán thành công
+                    CancelUrl = "https://datn-be-oygi.onrender.com/Admin/Recharge" // URL nếu người dùng hủy
                 },
                 PurchaseUnits = new List<PurchaseUnitRequest>
                 {
