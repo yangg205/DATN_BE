@@ -42,4 +42,18 @@ public class BossController : Controller
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
+
+    [HttpGet("all")]
+    public async Task<IActionResult> GetAllBosses()
+    {
+        try
+        {
+            var bosses = await _playerCharacterBattleService.GetAllBoss();
+            return Ok(bosses);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
 }
