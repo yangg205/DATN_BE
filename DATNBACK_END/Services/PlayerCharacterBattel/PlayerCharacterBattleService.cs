@@ -148,5 +148,30 @@ public class PlayerCharacterBattleService : IPlayerCharacterBattleService
             throw new Exception("Loi o server" + ex.Message);
         }
     }
-
+    public async Task<Boss> createBoss(int Boss_id, string Name, int Level, int Hp, int Dame, int Def, int Location_x, int Location_y, int Location_z, double Difficult)
+    {
+        try
+        {
+            var boss = new Boss
+            {
+                Boss_id = Boss_id,
+                Name = Name,
+                Level = Level,
+                Hp = Hp,
+                Dame = Dame,
+                Def = Def,
+                Location_x = Location_x,
+                Location_y = Location_y,
+                Location_z = Location_z,
+                Difficult = Difficult
+            };
+            _context.Boss.Add(boss);
+            await _context.SaveChangesAsync();
+            return boss;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Loi khi tao Boss: " + ex.Message);
+        }
+    }
 }
