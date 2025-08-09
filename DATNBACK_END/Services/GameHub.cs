@@ -16,13 +16,15 @@ public class GameHub : Hub
     private readonly IAchievmentService _achievmentService;
     private readonly IItemService _itemService;
     private readonly ITransactionService _transactionService;
+    private readonly IPlayerCharacterBattleService _playerCharacterBattleService;
 
     public GameHub(IPlayerCharacterSkillService playerCharacterSkillService,
                    IPlayerCharacterService playerCharacterService,
                    IPlayerService playerService,
-                   IAchievmentService achievmentService
-                   , IItemService itemService,
-                   ITransactionService transactionService)
+                   IAchievmentService achievmentService,
+                   IItemService itemService,
+                   ITransactionService transactionService,
+                   IPlayerCharacterBattleService playerCharacterBattleService)
     {
         _playerCharacterService = playerCharacterService;
         _playerService = playerService;
@@ -30,6 +32,7 @@ public class GameHub : Hub
         _achievmentService = achievmentService;
         _itemService = itemService;
         _transactionService = transactionService;
+        _playerCharacterBattleService = playerCharacterBattleService;
     }
     public async Task<ReturnPlayerCharacterSkill> UpdateSkill(int playerCharacterId, int skillTreeId)
     {
@@ -118,5 +121,9 @@ public class GameHub : Hub
     public async Task<ExchangeCurrencyResponseDTO> ExchangeCurrency(ExchangeCurrencyRequestDTO request)
     {
         return await _playerService.ExchangeCurrencyAsync(request);
+    }
+    public async Task<Battle> Battle(BattleRq battleRq)
+    {
+        return await _playerCharacterBattleService.Battle(battleRq.Player_Characters_id, battleRq.Boss_id, battleRq.Death, battleRq.maxtime, battleRq.realtime);
     }
 }   
