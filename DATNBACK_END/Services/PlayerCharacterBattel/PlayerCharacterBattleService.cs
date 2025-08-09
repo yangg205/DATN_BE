@@ -175,19 +175,19 @@ public class PlayerCharacterBattleService : IPlayerCharacterBattleService
         }
     }
     public async Task<List<Boss>> GetAllBoss()
+{
+    try
     {
-        try
+        var bosses = await _context.Boss.ToListAsync(); // Ensure the context property is named correctly (e.g., Bosses, not Boss)
+        if (!bosses.Any())
         {
-            var bosses = await _context.Boss.ToListAsync();
-            if (bosses == null || !bosses.Any())
-            {
-                throw new Exception("Khong co Boss nao ton tai");
-            }
-            return bosses.FirstOrDefault(); // Assuming you want to return the first boss for simplicity
+            throw new Exception("Không có Boss nào tồn tại");
         }
-        catch (Exception ex)
-        {
-            throw new Exception("Loi khi lay danh sach Boss: " + ex.Message);
-        }
+        return bosses; // Return the full list
     }
+    catch (Exception ex)
+    {
+        throw new Exception("Lỗi khi lấy danh sách Boss: " + ex.Message);
+    }
+}
 }
