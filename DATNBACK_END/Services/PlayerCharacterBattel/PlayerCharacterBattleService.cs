@@ -174,4 +174,20 @@ public class PlayerCharacterBattleService : IPlayerCharacterBattleService
             throw new Exception("Loi khi tao Boss: " + ex.Message);
         }
     }
+    public async Task<List<Boss>> GetAllBoss()
+    {
+        try
+        {
+            var bosses = await _context.Boss.ToListAsync();
+            if (bosses == null || !bosses.Any())
+            {
+                throw new Exception("Khong co Boss nao ton tai");
+            }
+            return bosses.FirstOrDefault(); // Assuming you want to return the first boss for simplicity
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Loi khi lay danh sach Boss: " + ex.Message);
+        }
+    }
 }
